@@ -1,4 +1,4 @@
-import { useStory } from '../../context/StoryProvider';
+import { useStory } from '../../context/useStory';
 
 export default function SectionHook() {
   const { activePersona } = useStory();

@@ -1,10 +1,10 @@
-import { useStory } from '../../context/StoryProvider';
+import { useStory } from '../../context/useStory';
 import { guessFeedback } from '../../lib/guessFeedback';
 
 export default function SectionGuessResult() {
   const { activePersona, guess } = useStory();
 
-  if (!activePersona) {
+  if (!activePersona || guess === null) {
     return null;
   }
 

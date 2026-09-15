@@ -1,11 +1,10 @@
-import { useStory } from '../../context/StoryProvider';
-import { STORY } from '../../data/story.data';
+import { useStory } from '../../context/useStory';
 import { formatMoney } from '../../lib/format';
 
 export default function SectionTakeaway() {
-  const { activePersona, switchPersona, replay } = useStory();
+  const { activePersona, story, switchPersona, replay } = useStory();
 
-  if (!activePersona) {
+  if (!activePersona || !story) {
     return null;
   }
 
@@ -34,7 +33,7 @@ export default function SectionTakeaway() {
             Try a different paycheck:
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {STORY.personas.map((persona) => {
+            {story.personas.map((persona) => {
               const selected = persona.id === activePersona.id;
 
               return (

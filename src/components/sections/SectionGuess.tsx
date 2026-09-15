@@ -1,4 +1,4 @@
-import { useStory } from '../../context/StoryProvider';
+import { useStory } from '../../context/useStory';
 import { STORY } from '../../data/story.data';
 
 export default function SectionGuess() {

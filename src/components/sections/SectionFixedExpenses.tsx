@@ -1,4 +1,4 @@
-import { useStory } from '../../context/StoryProvider';
+import { useStory } from '../../context/useStory';
 import { formatMoney } from '../../lib/format';
 
 export default function SectionFixedExpenses() {
