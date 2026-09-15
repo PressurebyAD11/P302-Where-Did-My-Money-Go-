@@ -255,6 +255,14 @@ export async function getStory(): Promise<Story> {
 3. **Pinned reveal beat** — pin the reveal section briefly (`pin: true`, short scroll distance) so the "everything stops → $XXX count-up" lands as a held moment. Keep pins short.
 4. **Category bars** — a timeline triggered on the reveal section: bars tween width `0 → target%` with `stagger`, longest-first, amounts counting up alongside.
 
+**Payoff gating (REQUIRED — the core storytelling rule).** Every section's payoff/conclusion must stay hidden until its own scroll animation completes; it is revealed as the **final step of that section's scrubbed timeline** (start it at `opacity: 0`, then `tl.to(payoff, { opacity: 1, y: 0 })` after the last content tween). A conclusion must never be visible before the buildup that earns it — this is a story, and stories don't show the ending first. Because it's part of the scrubbed timeline (not a timer or `toggleActions`), it also hides again when the viewer scrolls back up, staying in sync with scroll position. In reduced-motion, the payoff is simply present with the final values. Apply this to, at minimum:
+   - **Fixed expenses** → "${remainingAfterFixed} left. So far, everything looks about right." appears only after the balance lands on `remainingAfterFixed` and all bills have revealed. *(reference implementation — done)*
+   - **Small purchases** → the section's closing beat appears only after the stream has run and the balance reaches `remainingFinal`.
+   - **Reveal ($847)** → the `discretionaryTotal` count-up stays hidden until the viewer has scrolled through the transaction stream (this is also what prevents the reveal from spoiling the guess).
+   - **Category bars** → bars grow from `0`; never render pre-filled.
+   - **Takeaway** → the closing insight appears only after the category reveal completes.
+   Related interaction gate (not scroll-based): **`SectionGuessResult` renders nothing while `guess === null`** — the result is conditional on the interaction existing, so the answer is never shown before the viewer guesses. *(done)*
+
 **Responsive branching** — wrap setup in **`gsap.matchMedia()`**:
 - `(min-width: 768px)` → allow scrub + the pinned reveal.
 - `(max-width: 767px)` → lighter scrub, **avoid pinning** (pins feel awkward on short mobile viewports); use plain entrance triggers + timeline count-ups instead.
