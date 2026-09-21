@@ -38,6 +38,14 @@ export function StoryProvider({ children }: { children: ReactNode }) {
     [resetStoryFlow],
   );
 
+  const switchPersonaNoScroll = useCallback(
+    (id: PersonaId) => {
+      setActivePersonaId(id);
+      setGuess(null);
+    },
+    [],
+  );
+
   const replay = useCallback(() => {
     resetStoryFlow();
   }, [resetStoryFlow]);
@@ -51,8 +59,9 @@ export function StoryProvider({ children }: { children: ReactNode }) {
     guess,
     setGuess,
     switchPersona,
+    switchPersonaNoScroll,
     replay,
-  }), [story, activePersonaId, activePersona, guess, switchPersona, replay]);
+  }), [story, activePersonaId, activePersona, guess, switchPersona, switchPersonaNoScroll, replay]);
 
   return <StoryContext.Provider value={value}>{children}</StoryContext.Provider>;
 }

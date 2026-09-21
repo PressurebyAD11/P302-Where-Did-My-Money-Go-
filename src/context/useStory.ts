@@ -8,6 +8,7 @@ export type StoryContextValue = {
   guess: CategoryId | null;
   setGuess: (guess: CategoryId | null) => void;
   switchPersona: (id: PersonaId) => void;
+  switchPersonaNoScroll: (id: PersonaId) => void;
   replay: () => void;
 };
 

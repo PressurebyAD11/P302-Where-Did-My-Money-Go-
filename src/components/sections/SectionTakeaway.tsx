@@ -1,22 +1,85 @@
+import { useEffect, useRef } from 'react';
 import { useStory } from '../../context/useStory';
+import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
 import { formatMoney } from '../../lib/format';
 
 export default function SectionTakeaway() {
-  const { activePersona, story, switchPersona, replay } = useStory();
+  const { activePersona, replay } = useStory();
+  const root = useRef<HTMLElement>(null);
+  const insightRef = useRef<HTMLDivElement>(null);
 
-  if (!activePersona || !story) {
+  useEffect(() => {
+    if (!activePersona) {
+      return;
+    }
+
+    ScrollTrigger.refresh();
+  }, [activePersona?.id]);
+
+  useGSAP(
+    () => {
+      const rootEl = root.current;
+      const insightEl = insightRef.current;
+
+      if (!activePersona || !rootEl || !insightEl) {
+        return;
+      }
+
+      const mm = gsap.matchMedia(rootEl);
+
+      mm.add(
+        {
+          isDesktop: '(min-width: 768px)',
+          isMobile: '(max-width: 767px)',
+          reduced: '(prefers-reduced-motion: reduce)',
+        },
+        (ctx) => {
+          const { isDesktop, reduced } = ctx.conditions as {
+            isDesktop: boolean;
+            isMobile: boolean;
+            reduced: boolean;
+          };
+
+          if (reduced) {
+            gsap.set(rootEl, { autoAlpha: 1, y: 0 });
+            gsap.set(insightEl, { opacity: 1, y: 0 });
+            return;
+          }
+
+          gsap.set(insightEl, { opacity: 0, y: 16 });
+
+          gsap.to(insightEl, {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: rootEl,
+              start: 'top 75%',
+              end: isDesktop ? 'bottom 55%' : 'bottom 80%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        },
+      );
+
+      return () => mm.revert();
+    },
+    { scope: root, dependencies: [activePersona?.id], revertOnUpdate: true },
+  );
+
+  if (!activePersona) {
     return null;
   }
 
   return (
-    <section className="py-10">
+    <section ref={root} className="py-10">
       <div className="rounded-[2rem] border border-stone-200 bg-stone-50 p-6 sm:p-8">
-        <p className="text-base font-medium text-stone-700">
-          You didn&apos;t make one {formatMoney(activePersona.discretionaryTotal)} purchase. You made dozens of small ones.
-        </p>
-        <p className="mt-4 text-base font-medium text-stone-700">
-          Your money didn&apos;t disappear. It went somewhere. Understanding where gives you the power to decide where it goes next.
-        </p>
+        <div ref={insightRef}>
+          <p className="text-base font-medium text-stone-700">
+            Your money didn&apos;t disappear. It went somewhere. Understanding where gives you the power to decide where it goes next.
+          </p>
+        </div>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <button
@@ -26,37 +89,6 @@ export default function SectionTakeaway() {
           >
             Watch it again
           </button>
-        </div>
-
-        <div className="mt-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">
-            Try a different paycheck:
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {story.personas.map((persona) => {
-              const selected = persona.id === activePersona.id;
-
-              return (
-                <button
-                  key={persona.id}
-                  type="button"
-                  onClick={() => switchPersona(persona.id)}
-                  aria-pressed={selected}
-                  className={[
-                    'rounded-2xl border p-4 text-left transition-colors',
-                    selected
-                      ? 'border-stone-900 bg-stone-900 text-white'
-                      : 'border-stone-300 bg-white text-stone-900 hover:border-stone-400',
-                  ].join(' ')}
-                >
-                  <div className="text-lg font-bold">{persona.name}</div>
-                  <div className={selected ? 'mt-2 text-sm text-stone-200' : 'mt-2 text-sm text-stone-600'}>
-                    {persona.vibe}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-4 text-base text-stone-700">
