@@ -46,6 +46,8 @@ export interface Persona {
   name: string;
   /** One-line description shown on the replay card. Never expose the #1 category here. */
   vibe: string;
+  /** Personalized intro line shown in the hook section. */
+  intro?: string;
   paycheck: number;
   fixedExpenses: Bill[];
   transactions: Transaction[];

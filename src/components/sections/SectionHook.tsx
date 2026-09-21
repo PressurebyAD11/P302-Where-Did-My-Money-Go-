@@ -17,8 +17,13 @@ export default function SectionHook() {
       <p className="mt-4 text-base text-stone-500">
         No account creation. No bank connection. Just scroll.
       </p>
+      {activePersona?.intro && (
+        <p className="mt-4 max-w-xl text-base text-stone-600">
+          {activePersona.intro}
+        </p>
+      )}
       <p className="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-stone-400">
-        Default persona: {activePersona?.name ?? 'Alex'}
+        {activePersona?.name ?? 'Alex'}
       </p>
     </section>
   );
