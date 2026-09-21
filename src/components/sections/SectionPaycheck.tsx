@@ -8,6 +8,13 @@ export default function SectionPaycheck() {
     return null;
   }
 
+  const handleStartClick = () => {
+    const fixedExpensesSection = document.querySelector('[data-section="fixed-expenses"]');
+    if (fixedExpensesSection) {
+      fixedExpensesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="py-10">
       <div className="rounded-[2rem] border border-stone-200 bg-stone-50 p-6 sm:p-8">
@@ -18,9 +25,12 @@ export default function SectionPaycheck() {
           +{formatMoney(activePersona.paycheck)}
         </div>
         <p className="mt-5 text-xl text-stone-700">Let&apos;s see where it goes.</p>
-        <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-stone-700">
+        <button
+          onClick={handleStartClick}
+          className="mt-8 inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-stone-700 transition-colors hover:bg-stone-50 active:bg-stone-100"
+        >
           Start
-        </div>
+        </button>
       </div>
     </section>
   );

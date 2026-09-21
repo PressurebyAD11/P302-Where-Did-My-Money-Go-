@@ -112,7 +112,7 @@ export default function SectionFixedExpenses() {
   }
 
   return (
-    <section ref={root} className="py-10">
+    <section ref={root} data-section="fixed-expenses" className="py-10">
       <div className="space-y-6 rounded-[2rem] border border-stone-200 bg-white p-6 sm:p-8">
         <div className="space-y-2">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-500">
