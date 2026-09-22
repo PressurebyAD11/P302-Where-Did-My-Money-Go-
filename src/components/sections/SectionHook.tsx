@@ -12,7 +12,7 @@ export default function SectionHook() {
         Why does my paycheck disappear even when I don&apos;t feel like I&apos;m spending that much?
       </h1>
       {activePersona?.intro && (
-        <p className="mt-4 max-w-xl text-base text-stone-600">
+        <p className="mt-4 max-w-xl text-lg text-stone-600">
           {activePersona.intro}
         </p>
       )}
