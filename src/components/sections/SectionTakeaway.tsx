@@ -87,7 +87,7 @@ export default function SectionTakeaway() {
             onClick={replay}
             className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white"
           >
-            Watch it again
+            Try another paycheck
           </button>
         </div>
 
