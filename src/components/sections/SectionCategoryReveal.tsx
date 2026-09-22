@@ -124,8 +124,7 @@ export default function SectionCategoryReveal() {
 
         <div ref={payoffRef} className="mt-8 border-t border-stone-200 pt-5">
           <p className="text-lg font-semibold text-stone-700">
-            You didn&apos;t make one {formatMoney(activePersona.discretionaryTotal)} purchase.
-            You made dozens of small ones.
+            You didn&apos;t make one big purchase. You made dozens of small ones.
           </p>
         </div>
       </div>
