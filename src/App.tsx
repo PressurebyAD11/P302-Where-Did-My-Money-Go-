@@ -1,3 +1,4 @@
+import { AuthProvider } from './context/AuthProvider';
 import { StoryProvider } from './context/StoryProvider';
 import { useStory } from './context/useStory';
 import SectionHook from './components/sections/SectionHook';
@@ -32,9 +33,11 @@ function StoryLayout() {
 
 function App() {
   return (
-    <StoryProvider>
-      <StoryLayout />
-    </StoryProvider>
+    <AuthProvider>
+      <StoryProvider>
+        <StoryLayout />
+      </StoryProvider>
+    </AuthProvider>
   );
 }
 
