@@ -1,10 +1,10 @@
 # PRD — "Where Did My Money Go?" (P302)
 
-**One-line:** A single, fully-responsive, scroll-driven page that turns a fictional paycheck into an interactive data story — *paycheck → transactions → guess → reveal → takeaway* — to make invisible small spending feel visible.
+**One-line:** A single, fully-responsive, scroll-driven page that turns a fictional paycheck into an interactive data story — *pick a persona → START → transactions → guess → guess result → category breakdown → total → takeaway* — to make invisible small spending feel visible.
 
-**Status:** Draft **v3** · **Owner:** _you_ · **Build target:** React + shadcn/ui, **GSAP ScrollTrigger**, mock data, built in VS Code with GitHub Copilot Agent
+**Status:** **v4 (as-built)** · **Owner:** _you_ · **Build target:** React + shadcn/ui, **GSAP ScrollTrigger**, mock data, built in VS Code with GitHub Copilot Agent
 
-> **Decisions locked:** Animation = **GSAP ScrollTrigger** · Layout = **fully responsive, equal weight (mobile ⇄ desktop)** · Data = **three selectable personas, default on first run** · Persona switching is a **replay affordance at the end**, not an entry gate · Reveal chart is **discretionary-only** (fixed bills excluded) · **No audio** in v1. All reflected throughout; nothing left open blocks the build.
+> **v4 reflects the shipped app.** Changes since v3, all live: persona picker now lives in **Part 0** (Alex pre-selected, optional) and is **removed from the end**; a **START** button initiates the story and smooth-scrolls into it; the reveal sequence is **reordered** (guess → guess result → category bars → total as the closer); each persona has a **spoiler-free intro line**; the category card's closing line dropped its redundant dollar amount; the category bars and the total are **gated behind the guess** via parent-level conditional rendering; the end button is **"Try another paycheck"** (resets state + returns to Part 0). Locked earlier and still true: GSAP ScrollTrigger · fully responsive · three personas · discretionary-only reveal chart · no audio.
 
 ---
 
@@ -53,15 +53,15 @@ This is an **interactive data story**, not a personal-finance app. No account cr
 **Viewer:** young professional / everyday consumer, arriving cold from a link, on **any device**.
 
 ### In-story fictional personas (v1 ships three)
-Each persona has its own reconciled numbers, and crucially a **different #1 category**, so the guess isn't the same twice. **Alex is the default** and runs on the first visit with no picker; the others are reached via "Try a different paycheck" at the end (§4 Part 3d). The #1 category is **internal** — it must never be shown on a persona card, or it spoils the guess. All numbers fictional and internally consistent (full data in Appendix A).
+Each persona has its own reconciled numbers, and crucially a **different #1 category**, so the guess isn't the same twice. **Alex is the default** and pre-selected in the Part 0 picker; the viewer can switch to Jordan or Sam before pressing START (§4 Part 0). The #1 category is **internal** — it must never be shown on a persona card or intro line, or it spoils the guess. Each persona also carries a short **spoiler-free intro line** shown in Part 0. All numbers fictional and internally consistent (full data in Appendix A).
 
-| Persona | Vibe (shown on card) | Paycheck | #1 category *(hidden from viewer)* | Discretionary total | Left over |
-|---|---|---|---|---|---|
-| **Alex** *(default)* | Young professional | $3,842 | Dining Out ($286) | $847 | $797 |
-| **Jordan** | Car-free commuter | $3,410 | Transportation ($305) | $912 | $518 |
-| **Sam** | Online shopper | $4,120 | Shopping ($342) | $968 | $792 |
+| Persona | Vibe (on card) | Paycheck | #1 category *(hidden)* | Discretionary | Left over | Intro line |
+|---|---|---|---|---|---|---|
+| **Alex** *(default)* | Young professional | $3,842 | Dining Out ($286) | $847 | $797 | "Meet Alex. Steady paycheck, big city, and a nagging feeling the money vanishes too fast." |
+| **Jordan** | Car-free commuter | $3,410 | Transportation ($305) | $912 | $518 | "Meet Jordan. Careful with the big stuff, still somehow short at month's end." |
+| **Sam** | Online shopper | $4,120 | Shopping ($342) | $968 | $792 | "Meet Sam. Does everything 'right,' and still can't explain where it all goes." |
 
-Personas are easily extendable — the data layer is an array (§7).
+Note the intro lines are deliberately **category-neutral** — none hint at dining, transport, shopping, or coffee. Personas are easily extendable — the data layer is an array (§7).
 
 ---
 
@@ -69,36 +69,34 @@ Personas are easily extendable — the data layer is an array (§7).
 
 One long vertical scroll of ordered **sections**. Sections animate as they enter/scrub through the viewport via GSAP ScrollTrigger (§8). Native document scroll — short, deliberate **pins** are allowed for dramatic beats (§8), but no free-scroll hijacking.
 
-### Part 0 — Hook (intro)
+### Part 0 — Hook + persona pick + START
 - Headline: **"Why does my paycheck disappear even when I don't feel like I'm spending that much?"**
 - Subtext: *It's often not one big purchase. It's dozens of small decisions that become invisible until we look at them individually.*
 - Reassurance: *No account creation. No bank connection. Just scroll.*
+- **Per-persona intro line** (spoiler-free — see §3): e.g. *"Meet Alex. Steady paycheck, big city, and a nagging feeling the money vanishes too fast."* Plus a small persona-name label.
+- **Persona picker** (three cards: Alex / Jordan / Sam — name + vibe only, **never the #1 category**). **Alex is pre-selected**; choosing is **optional**. Tapping a card swaps the active persona and **resets guess state, staying in place** (no scroll — the viewer is already at the top).
+- **START button** — begins the story with the currently selected persona and **smooth-scrolls** into Part 2a (the fixed-expenses section, tagged `data-section="fixed-expenses"`). START is a real `<button>` with hover/active states; a viewer who ignores the picker just presses START and runs Alex.
 
-> **First run has no persona gate.** The story defaults to the `defaultPersonaId` (Alex) and flows straight from the hook into Part 1 — zero friction, no cold choice before the viewer has any context. Persona switching is a **replay affordance** surfaced only at the end (Part 3d). This keeps the first run's surprise intact; the persona choice appears once the viewer is primed to explore.
+> **Design note (why the picker is here, not at the end).** Earlier drafts placed the picker as an end-of-story replay affordance. It now lives in Part 0 so the persona choice reads as part of the opening, while START stays the single "begin" gate. Because Alex is pre-selected, there's no forced cold choice — the first-run friction the old design avoided is preserved.
 
 ### Part 1 — Your paycheck arrives
 - Large animated figure: **the active persona's paycheck** ("Your paycheck just hit.")
-- Line: *Let's see where it goes.* · START cue.
+- Line: *Let's see where it goes.* (START, above, is the affordance that advances here.)
 
 ### Part 2a — The expected expenses (fixed bills)
 Predictable bills appear one by one; a **Remaining balance** counter drains from the paycheck amount.
 - Bills and order come from the persona (Appendix A). Example (Alex): 🏠 Rent $1,450 · 🚗 Car $420 · 💡 Utilities $186 · 🛡️ Insurance $142 → **$1,644 left.**
-- Beat line: *So far, everything looks about right. Continue scrolling.*
+- Payoff line **"$1,644 left. So far, everything looks about right. Continue scrolling."** is gated to appear only after the drain completes (§8 payoff gating).
 
 ### Part 2b — The small purchases begin
-The discretionary stream starts — many small transactions appear in sequence (staggered), each nudging the balance down. **Main animation:** the remaining-money number decreases as transactions appear. Pacing feels casual, then slightly relentless.
+The discretionary stream starts — many small transactions appear staggered, each nudging the balance down toward `remainingFinal`. **Main animation:** the remaining-money number decreases as transactions appear. Pacing feels casual, then slightly relentless.
 
-### Part 3-guess — "Where do you think the most money went?"  *(before the reveal)*
+### Part 3-guess — "Where do you think the most money went?"
 - Prompt: **"Where do you think the most money went?"**
 - Fixed chips (single-select): **COFFEE · DINING · SHOPPING · RIDESHARE** (these four categories exist in every persona).
-- Records the guess and advances. Optional — skipping yields neutral reveal copy.
+- **The guess is the gate for everything below it.** Until a chip is clicked, the guess result, the category bars, and the total do **not** render (see gating note below). This makes the reveal something the viewer earns by participating.
 
-### Part 3a — The reveal (pause)
-- Everything stops. Whitespace. A beat.
-- *Those purchases didn't feel very big. Together, they were…*
-- Animated count-up to the persona's **discretionary total** (Alex: $847).
-
-### Part 3b — Guess result  *(now computed per persona)*
+### Part 3b — Guess result  *(computed per persona; renders only after a guess)*
 Feedback is derived from the **selected persona's** ranked categories, not hardcoded. Logic (`guessFeedback(guess, persona)`):
 
 | Case | Template |
@@ -108,45 +106,49 @@ Feedback is derived from the **selected persona's** ranked categories, not hardc
 | Any other rank | **Not quite.** {guessLabel} landed {ordinal} at **${guessAmount}**. #1 was {topLabel} — **${topAmount}**. |
 | No guess | **Here's where it actually went.** #1 was {topLabel} — **${topAmount}**. |
 
-Optional per-category flavor overrides (nice touch): e.g. a Coffee guess → *"Coffee felt constant, but it only added up to ${guessAmount}."* Keep as an override map, defaulting to the templates above.
+Optional per-category flavor overrides: e.g. a Coffee guess → *"Coffee felt constant, but it only added up to ${guessAmount}."* Override map, defaulting to the templates above. *Worked example (Alex, guessed SHOPPING):* "Close — but not quite. #1 was Dining Out ($286). Shopping came in second at $173."
 
-*Worked example (Alex, guessed SHOPPING):* "Close — but not quite. #1 was Dining Out ($286). Shopping came in second at $173."
+### Part 3c — Category reveal (the bars)  *(renders only after a guess)*
+An animated horizontal bar chart. Bars grow from 0 on scroll, staggered longest-first, per-category colors; amounts count up. Bars/amounts/scale come from the **persona's** category totals. Example (Alex): Dining Out $286 (100%) · Shopping $173 · Transportation $142 · Subscriptions $94 · Coffee $87 · Entertainment $65.
+- Closing line: **"You didn't make one big purchase. You made dozens of small ones."** (generic — no dollar amount, since the total below carries the number; avoids redundancy).
 
-### Part 3c — Category reveal (the chart)
-Transactions reorganize into an animated horizontal bar chart. Bars grow from 0, staggered longest-first. Bars, amounts, and the max scale come from the **persona's** category totals. Example (Alex): Dining Out $286 (100%) · Shopping $173 · Transportation $142 · Subscriptions $94 · Coffee $87 · Entertainment $65 · **Total $847**.
+> **Fixed bills are deliberately excluded from this chart** — discretionary categories only. Rent/car dwarf the six bars and would flatten the punchline; bills live only in Part 2a.
+>
+> **Implementation caution — bars.** The fill is a colored child element inside each track; animate its **`width`** (Tailwind v4's transform system can override GSAP `scaleX`, and animating a missing/absent fill silently no-ops — both were real bugs). The initial `width:0` must live in `gsap.set`/CSS, **not** as an inline JSX `transform`, or React re-renders stomp it.
 
-> **Fixed bills are deliberately excluded from this chart.** The reveal is about the *invisible discretionary spend* only. Rent/car/etc. are the expected expenses the viewer already knows about, and at $1,450 vs. $286 they would dwarf the six discretionary bars and flatten the punchline. The chart shows discretionary categories exclusively; bills live only in Part 2a.
+### Part 3d — The total  *(the closer; renders only after a guess)*
+- Everything stops. Whitespace. A beat. *Those purchases didn't feel very big. Together, they were…*
+- Animated count-up to the persona's **discretionary total** (Alex $847 · Jordan $912 · Sam $968), landing as the **final** beat of the reveal — the number is the payoff, so it comes *after* the breakdown, not before.
 
-- Key insight: **"You didn't make one ${discretionaryTotal} purchase. You made dozens of small ones."**
+### Part 3e — Takeaway
 - Close: *Your money didn't disappear. It went somewhere. Understanding where gives you the power to decide where it goes next.*
-- Optional secondary beat (recommended): for Alex, the "invisible" $847 is **more than the $797 left over** — a quiet, punchy stat. Compute per persona (`discretionaryTotal` vs `remainingFinal`) and only show it when discretionary ≥ remaining.
+- Optional secondary stat: **"This is more than the ${remainingFinal} left over."** (Alex: $847 discretionary > $797 left) — shown only when `discretionaryTotal ≥ remainingFinal`.
+- **"Try another paycheck"** button — **resets all story state (guess cleared) and returns to Part 0**, where the viewer can pick a different persona (or the same one) and run again. This is the sole replay affordance; it doubles as restart + re-pick. (Formerly two buttons, "Watch it again" / "Try a different paycheck"; consolidated into one.)
 
-**Replay / persona switch (this is where personas live):**
-- **"Watch it again"** — replays the current persona; resets guess + animation state + scroll.
-- **"Try a different paycheck"** — reveals the persona cards **here** (name + one-line vibe; **never the #1 category** — that would spoil the guess). Selecting one swaps the active persona, resets state, and scrolls back to Part 1 to run the story again with different numbers. Because each persona has a different #1 category, the guess stays meaningful on replay.
-- This is the **only** place the persona picker appears — there is no upfront gate (see Part 0 note).
+> **Gating note (how the guess gates the reveal).** `SectionGuessResult`, `SectionCategoryReveal`, and the total (`SectionRevealPause`) are all hidden until `guess` is non-null. This is done by **conditionally rendering them from the parent (`App.tsx`)** — e.g. `{guess && <SectionCategoryReveal />}` — **not** by an early `return null` inside those components. The internal-early-return approach crashes React (Rules of Hooks: an early return placed after `useGSAP`/`useRef` renders fewer hooks on the gated pass). `SectionGuessResult` can use an internal guard because it has no hooks; the hook-heavy sections must be gated by the parent.
 
 ---
 
 ## 5. Functional requirements
 
 - **FR1** One continuous vertical scroll with ordered sections.
-- **FR2** First run uses `defaultPersonaId` with **no picker step**; the story flows straight from the hook into Part 1. All downstream numbers/copy read from the active persona.
-- **FR3** Persona switching is offered **only at the end** (Part 3d, "Try a different paycheck"); selecting a persona swaps the active persona, resets state, and re-runs from Part 1. Persona cards must **not** display the #1 category.
-- **FR4** Sections animate via GSAP ScrollTrigger on enter/scrub; entrances fire once per run (reset on restart/persona switch).
-- **FR5** The **Remaining balance** counter animates as bills/transactions land; final value = persona `remainingFinal`.
-- **FR6** Fixed expenses render in the persona's order and reduce balance to `remainingAfterFixed`.
-- **FR7** Discretionary transactions stream staggered; per persona they sum exactly to `discretionaryTotal` and to each category subtotal.
-- **FR8** The guess prompt offers exactly the four fixed chips (single-select) and is skippable.
-- **FR9** The reveal count-up lands on the persona's `discretionaryTotal`.
-- **FR10** Guess-result copy is computed by `guessFeedback(guess, persona)` per §4 Part 3b.
-- **FR11** The category chart animates six bars proportional to the persona's category amounts (max = that persona's top category). **Fixed bills are excluded from this chart** (discretionary-only).
-- **FR12** Restart ("Watch it again") resets guess, animation triggers, and scroll for the current persona; "Try a different paycheck" additionally swaps persona and re-runs.
-- **FR13** Fully responsive: mobile and desktop are both first-class (see §11); GSAP behavior branches by breakpoint via `matchMedia`.
-- **FR14** `prefers-reduced-motion: reduce` → skip transitions/scrub/pins, render final states; all copy/data still present.
-- **FR15** Content is legible and correctly ordered even if animation JS fails (progressive enhancement).
-- **FR16** No audio in v1 (no sound effects, no autoplay). Any reveal emphasis is visual/motion only.
-- **FR17** No network calls to real services; all data from the mock module (§7).
+- **FR2** Part 0 shows the persona picker with **Alex pre-selected**; choosing is optional. Tapping a card swaps the active persona and resets guess state **in place** (no scroll). All downstream numbers/copy read from the active persona.
+- **FR3** A **START** button in Part 0 begins the story and smooth-scrolls to the fixed-expenses section (`data-section="fixed-expenses"`) with the currently selected persona.
+- **FR4** Each persona shows a spoiler-free **intro line** in Part 0; no card or intro line displays the #1 category.
+- **FR5** Sections animate via GSAP ScrollTrigger on enter/scrub; entrances fire once per run (reset on "Try another paycheck").
+- **FR6** The **Remaining balance** counter animates as bills/transactions land; final value = persona `remainingFinal`.
+- **FR7** Fixed expenses render in the persona's order and reduce balance to `remainingAfterFixed`; the "…left / looks about right" payoff line is gated until the drain completes.
+- **FR8** Discretionary transactions stream staggered; per persona they sum exactly to `discretionaryTotal` and to each category subtotal.
+- **FR9** The guess prompt offers exactly the four fixed chips (single-select).
+- **FR10** **The guess gates the reveal:** the guess result, category bars, and total render **only after** a chip is clicked. Implemented via parent-level conditional rendering in `App.tsx` (not internal early-returns in the hook-heavy sections — see §4 gating note).
+- **FR11** Reveal order is **guess → guess result → category bars → total**. Guess-result copy is computed by `guessFeedback(guess, persona)` (§4 Part 3b).
+- **FR12** The category chart animates six bars (animating **width**, colored fill child) proportional to the persona's category amounts, longest-first; the count-up total lands as the **final** beat. Fixed bills excluded.
+- **FR13** "Try another paycheck" **resets all state (guess cleared) and returns to Part 0**; it is the sole replay/restart affordance.
+- **FR14** Fully responsive: mobile and desktop are both first-class (see §11); GSAP behavior branches by breakpoint via `matchMedia`.
+- **FR15** `prefers-reduced-motion: reduce` → skip transitions/scrub/pins, render final states; all copy/data still present.
+- **FR16** Content is legible and correctly ordered even if animation JS fails (progressive enhancement).
+- **FR17** No audio in v1 (no sound effects, no autoplay). Any reveal emphasis is visual/motion only.
+- **FR18** No network calls to real services; all data from the mock module (§7).
 
 ---
 
@@ -156,48 +158,49 @@ Stack: **Vite + React + TypeScript + Tailwind + shadcn/ui**, animation via **GSA
 
 ### Component tree
 ```
-<App>
-  <StoryProvider>                 // activePersona, guess, phase, reset(), choosePersona()
-    <ScrollProgressBar />         // thin top progress indicator
-    <StoryContainer ref>          // GSAP scope (useGSAP) lives here
-      <SectionHook />                 // Part 0    (no persona gate)
-      <SectionPaycheck />             // Part 1    (HeroFigure, StartCue)
-      <SectionFixedExpenses />        // Part 2a   (BillRow[], RemainingBalance)
-      <SectionGuess />                // guess     (GuessChip[])
-      <SectionSmallPurchases />       // Part 2b   (TransactionRow[], RemainingBalance)
-      <SectionRevealPause />          // Part 3a   (CountUp -> discretionaryTotal)
-      <SectionGuessResult />          // Part 3b   (reads guess + persona)
-      <SectionCategoryReveal />       // Part 3c   (CategoryBar[], discretionary-only)
-      <SectionTakeaway />             // Part 3d   (RestartButton, PersonaCard[] for replay)
+<App>                              // reads `guess` from context; gates reveal sections below
+  <StoryProvider>                  // activePersona, guess, choosePersona(), setGuess(), reset()
+    <ScrollProgressBar />          // thin top progress indicator (optional)
+    <StoryContainer ref>           // GSAP scope (useGSAP) lives here
+      <SectionHook />                  // Part 0  (headline, intro line, PersonaCard[], START)
+      <SectionPaycheck />              // Part 1  (HeroFigure; START lives here / in Hook)
+      <SectionFixedExpenses />         // Part 2a (BillRow[], RemainingBalance) — data-section="fixed-expenses"
+      <SectionSmallPurchases />        // Part 2b (TransactionRow[], RemainingBalance)
+      <SectionGuess />                 // guess   (GuessChip[])
+      {guess && <SectionGuessResult />}     // Part 3b — gated behind guess
+      {guess && <SectionCategoryReveal />}  // Part 3c — gated behind guess (bars, discretionary-only)
+      {guess && <SectionRevealPause />}     // Part 3d — gated behind guess (CountUp -> total; the closer)
+      <SectionTakeaway />              // Part 3e (takeaway copy + "Try another paycheck")
     </StoryContainer>
   </StoryProvider>
 </App>
 ```
+The three `{guess && …}` gates are the parent-level rendering that makes the reveal conditional on the guess without violating the Rules of Hooks (§4 gating note). Note the reveal order: guess result → category bars → total.
 
 ### Shared / primitive components
-- **`PersonaCard`** — selectable card rendered **inside the takeaway** for replay (name + vibe only, **never the #1 category**); `selected`, `onSelect`. (shadcn `Card` + selection ring.)
+- **`PersonaCard`** — selectable card rendered **in Part 0** (name + vibe only, **never the #1 category**); `selected`, `onSelect`. Alex pre-selected. (shadcn `Card` + selection ring.)
 - **`RemainingBalance`** — animated counting number, `aria-live="polite"`; driven by GSAP (scrub or timeline).
 - **`CountUp`** — one-shot number tween (paycheck, discretionary total).
 - **`TransactionRow` / `BillRow`** — icon + label + amount; staggered entrance.
 - **`GuessChip`** — selectable chip (shadcn `Button`/`Toggle`); `selected`, `onSelect`, `aria-pressed`.
-- **`CategoryBar`** — label + animated bar + amount; `amount`, `max`, `color`, `index`.
-- **`SectionShell`** — consistent vertical rhythm + max-width + a `data-section` hook GSAP targets.
+- **`CategoryBar`** — label + animated bar (colored **fill child**, animate `width`) + amount; `amount`, `max`, `color`, `index`.
+- **`SectionShell`** — consistent vertical rhythm + max-width + a `data-section` hook GSAP/START target.
 - **`StoryText` / `SectionHeading`** — typographic primitives.
 
 ### shadcn/ui components
-`Button`, `Card`, `Badge`, `Progress`, `Separator`, `Tooltip`. Category chart is **hand-rolled animated bars** (GSAP-controlled `div` widths) rather than a chart lib — tighter control over the "grow from zero, staggered" reveal.
+`Button`, `Card`, `Badge`, `Progress`, `Separator`, `Tooltip`. Category chart is **hand-rolled animated bars** (GSAP-controlled fill `width`) rather than a chart lib — tighter control over the "grow from zero, staggered" reveal.
 
 ### State model
 ```ts
 type StoryState = {
-  activePersonaId: PersonaId;         // starts at defaultPersonaId ('alex'); no picker on first run
+  activePersonaId: PersonaId;         // starts at 'alex' (pre-selected in Part 0)
   guess: CategoryId | null;
+  choosePersona: (id: PersonaId) => void;  // Part 0 pick: swap persona, reset guess, stay in place
   setGuess: (c: CategoryId) => void;
-  switchPersona: (id: PersonaId) => void;  // called from the takeaway; swaps persona, resets guess, re-runs
-  replay: () => void;                 // "Watch it again" — same persona, reset guess + scroll
+  reset: () => void;                  // "Try another paycheck": clear guess + all state, scroll to Part 0
 };
 ```
-There is no `picking` phase — the first run has no gate. `switchPersona`/`replay` reset guess state, refresh GSAP triggers (§8), and scroll to Part 1. Section entrances are handled by GSAP triggers, not global state. Remaining balance is **derived** from scroll/timeline progress, not stored.
+Section entrances are handled by GSAP triggers, not global state. Remaining balance is **derived** from scroll/timeline progress, not stored. `reset()` returns to Part 0 (where the picker lives), so it doubles as restart + re-pick.
 
 ---
 
@@ -220,7 +223,8 @@ export interface GuessOption { id: string; label: string; category: CategoryId; 
 export interface Persona {
   id: PersonaId;
   name: string;
-  vibe: string;                     // one-liner for the picker (no category spoiler)
+  vibe: string;                     // one-liner for the picker card (no category spoiler)
+  intro: string;                    // Part 0 intro line (spoiler-free — no category hint)
   paycheck: number;
   fixedExpenses: Bill[];            // sums to paycheck - remainingAfterFixed
   transactions: Transaction[];      // sums to discretionaryTotal
@@ -348,12 +352,12 @@ src/
 
 1. **Scaffold** — Vite + TS + Tailwind + shadcn init, folder structure, `story.ts` + `story.data.ts` (all 3 personas, Appendix A), passing **data-integrity tests** for every persona.
 2. **Static story** — all sections rendered in *final-state* with correct copy/data for the default persona; correct order; native scroll; no animation.
-3. **Persona plumbing** — `StoryProvider` with `activePersonaId` starting at `defaultPersonaId`; all sections read from the active persona. **No upfront picker** — first run just uses the default.
-4. **GSAP foundation** — `lib/gsap.ts`, `useGSAP` scope, entrance triggers, `matchMedia` branches (desktop/mobile/reduced-motion), `ScrollTrigger.refresh()` on persona switch.
-5. **Money mechanics** — scrubbed balance drain (fixed → `remainingAfterFixed`, discretionary → `remainingFinal`), hero count-ups (paycheck, discretionary total).
-6. **Guess interaction** — chips + `guessFeedback(guess, persona)` + result section.
-7. **Category reveal** — GSAP bar timeline, staggered longest-first, count-up amounts, pinned reveal beat (desktop). Discretionary categories only.
-8. **Takeaway + replay** — closing copy, optional "more than what's left" stat, "Watch it again", and the `PersonaCard[]` switcher (no category shown); switching resets state and re-runs from Part 1.
+3. **Persona plumbing** — `StoryProvider` with `activePersonaId` starting at `'alex'`; all sections read from the active persona. Part 0 persona picker (Alex pre-selected, optional; tapping resets guess in place).
+4. **GSAP foundation** — `lib/gsap.ts`, `useGSAP` scope, entrance triggers, `matchMedia` branches (desktop/mobile/reduced-motion), `ScrollTrigger.refresh()` after layout / persona change.
+5. **Money mechanics** — scrubbed balance drain (fixed → `remainingAfterFixed`, discretionary → `remainingFinal`), hero count-ups (paycheck, total). Payoff lines gated until each drain completes.
+6. **Guess interaction** — chips + `guessFeedback(guess, persona)` + result section. The guess gates the reveal (parent-level `{guess && …}` rendering).
+7. **Category reveal** — GSAP bar timeline animating fill **width**, staggered longest-first, count-up amounts, per-category colors. Discretionary only.
+8. **START + reveal order + takeaway** — wire START to smooth-scroll into the story; order the reveal guess → result → bars → total; takeaway copy + "Try another paycheck" (resets all state, returns to Part 0).
 9. **Polish** — scroll progress bar, responsive pass, loading/empty states, confirm no audio anywhere.
 10. **QA & a11y** — keyboard nav, aria-live, contrast, reduced-motion, both breakpoints, all personas.
 
@@ -362,30 +366,36 @@ src/
 ## 14. Testing & QA
 
 - **Unit:** `guessFeedback(guess, persona)` correct across all cases for all personas (incl. no-guess); currency + ordinal formatting; **data-integrity assertions per persona** (category sums, discretionary total, `remainingFinal`).
-- **Component:** each section renders active-persona copy/data; the takeaway's persona cards + guess chips are single-select and cards never expose the #1 category; balance region has `aria-live`.
-- **Behavioral:** first run shows no picker and uses the default persona; reduced-motion renders final states without scrub/pin; "Watch it again" resets guess + scroll; "Try a different paycheck" swaps persona, resets state, refreshes triggers, and re-runs from Part 1.
-- **Manual:** full scroll on phone + desktop; reveal lands as a surprise in informal testing; switch personas from the takeaway and confirm the #1 category (and guess feedback) changes; confirm no audio plays.
+- **Component:** each section renders active-persona copy/data; the Part 0 persona cards + guess chips are single-select and cards never expose the #1 category; balance region has `aria-live`.
+- **Behavioral:** Part 0 defaults to Alex; picking Jordan/Sam then pressing START runs that persona's numbers throughout; the guess result, bars, and total stay hidden until a chip is clicked; reduced-motion renders final states without scrub/pin; "Try another paycheck" clears the guess and returns to Part 0 (so the reveal is hidden again until a new guess).
+- **Manual:** full scroll on phone + desktop; pick a non-default persona in Part 0 and confirm every section shows its numbers; reveal lands as a surprise; confirm no audio plays.
 
 ---
 
 ## 15. Analytics (mock, optional)
 
-No-op `track(event, payload)` (console/in-memory) for: `story_start`, `guess_selected`, `reveal_viewed`, `replay`, `persona_switched` (from the takeaway). Swappable for a real sink later. No real tracking in v1.
+No-op `track(event, payload)` (console/in-memory) for: `persona_selected` (Part 0), `story_start` (START), `guess_selected`, `reveal_viewed`, `restart` ("Try another paycheck"). Swappable for a real sink later. No real tracking in v1.
 
 ---
 
 ## 16. Decisions & scope
 
-All prior open questions are **resolved and locked** — nothing here blocks the build:
+All decisions are **resolved and reflected in the shipped app**:
 
-| Decision | Resolution |
+| Decision | Resolution (as built) |
 |---|---|
 | Animation stack | GSAP + ScrollTrigger + `useGSAP` |
 | Layout | Fully responsive, equal weight; `matchMedia` branches |
-| Data | Three selectable personas; **Alex is the default** and runs first with no picker |
-| Persona picker placement | **End-of-story replay affordance only** (Part 3d); no upfront gate; cards never show the #1 category |
-| Fixed bills in the reveal chart | **Excluded** — reveal is discretionary-only |
-| Audio | **None** in v1 (no SFX, no autoplay) |
+| Data | Three selectable personas; Alex pre-selected |
+| Persona picker placement | **Part 0** (Alex pre-selected, optional); removed from the end; cards never show the #1 category |
+| Entry | **START** button begins the story and smooth-scrolls in |
+| Reveal order | guess → guess result → category bars → **total (closer)** |
+| Reveal gating | guess result, bars, and total render only after a guess (parent-level `{guess && …}`) |
+| Persona intro lines | one spoiler-free line per persona in Part 0 |
+| Category card closing line | "You didn't make one big purchase…" (no dollar amount) |
+| Replay | single **"Try another paycheck"** button: clears state, returns to Part 0 |
+| Fixed bills in the reveal chart | **Excluded** — discretionary-only |
+| Audio | **None** (no SFX, no autoplay) |
 
 **Explicitly out of scope for v1 (future ideas, not blockers):** user-editable numbers / free-form personas, more than three personas, real analytics sink, shareable result links, localization. Add later without reworking the data layer (it's already an array).
 
@@ -394,6 +404,8 @@ All prior open questions are **resolved and locked** — nothing here blocks the
 ## Appendix A — Full mock dataset (all fictional, all reconciled)
 
 ### Persona 1 — Alex · paycheck $3,842 · #1 Dining Out · left over $797  *(reference: full transaction list)*
+
+**Vibe:** Young professional · **Intro:** "Meet Alex. Steady paycheck, big city, and a nagging feeling the money vanishes too fast."
 
 **Fixed ($2,198 → remaining $1,644):** Rent $1,450 · Car $420 · Utilities $186 · Insurance $142
 
@@ -410,6 +422,8 @@ All prior open questions are **resolved and locked** — nothing here blocks the
 
 ### Persona 2 — Jordan · paycheck $3,410 · #1 Transportation · left over $518
 
+**Vibe:** Car-free commuter · **Intro:** "Meet Jordan. Careful with the big stuff, still somehow short at month's end."
+
 **Fixed ($1,980 → remaining $1,430):** Rent $1,300 · Car $380 · Utilities $170 · Insurance $130
 **Category totals (sum $912):** Transportation 305 (1) · Dining 210 (2) · Coffee 128 (3) · Shopping 115 (4) · Subscriptions 92 (5) · Entertainment 62 (6)
 **Reconciliation:** 3410 − 1980 − 912 = **518**.
@@ -417,6 +431,8 @@ All prior open questions are **resolved and locked** — nothing here blocks the
 > Build note: generate per-category transactions summing to each subtotal (the data-integrity test enforces it), or hand-author like Alex.
 
 ### Persona 3 — Sam · paycheck $4,120 · #1 Shopping · left over $792
+
+**Vibe:** Online shopper · **Intro:** "Meet Sam. Does everything 'right,' and still can't explain where it all goes."
 
 **Fixed ($2,360 → remaining $1,760):** Rent $1,550 · Car $450 · Utilities $210 · Insurance $150
 **Category totals (sum $968):** Shopping 342 (1) · Dining 224 (2) · Subscriptions 118 (3) · Transportation 106 (4) · Coffee 98 (5) · Entertainment 80 (6)
@@ -430,13 +446,12 @@ All prior open questions are **resolved and locked** — nothing here blocks the
 
 ## Appendix B — Copy deck
 
-- **Hook:** "Why does my paycheck disappear even when I don't feel like I'm spending that much?" / "It's often not one big purchase. It's dozens of small decisions that become invisible until we look at them individually." / "No account creation. No bank connection. Just scroll." *(flows straight into Paycheck — no persona step here.)*
-- **Paycheck:** "Your paycheck just hit." · "+${paycheck}" · "Let's see where it goes." · START
-- **Fixed expenses:** "${remainingAfterFixed} left." · "So far, everything looks about right. Continue scrolling."
+- **Part 0 (Hook + pick + START):** "Why does my paycheck disappear even when I don't feel like I'm spending that much?" / "It's often not one big purchase. It's dozens of small decisions that become invisible until we look at them individually." / "No account creation. No bank connection. Just scroll." / persona intro line (per §3) / persona cards [Alex — Young professional] [Jordan — Car-free commuter] [Sam — Online shopper] *(name + vibe only, Alex pre-selected)* / [START]
+- **Paycheck (Part 1):** "Your paycheck just hit." · "+${paycheck}" · "Let's see where it goes."
+- **Fixed expenses:** "${remainingAfterFixed} left." · "So far, everything looks about right. Continue scrolling." *(gated until the drain completes)*
 - **Small purchases:** "Then the small purchases start."
-- **Guess:** "Where do you think the most money went?" · [COFFEE] [DINING] [SHOPPING] [RIDESHARE]
-- **Reveal pause:** "Those purchases didn't feel very big. Together, they were…" · "${discretionaryTotal}"
-- **Guess result:** computed per persona — see §4 Part 3b.
-- **Category reveal:** the active persona's six categories, longest-first.
-- **Takeaway:** "You didn't make one ${discretionaryTotal} purchase. You made dozens of small ones." · "Your money didn't disappear. It went somewhere. Understanding where gives you the power to decide where it goes next."
-- **Replay / persona switch (takeaway only):** [Watch it again] · "Try a different paycheck:" [Alex — young professional] [Jordan — car-free commuter] [Sam — online shopper] *(cards show name + vibe only — never the #1 category)*
+- **Guess:** "Where do you think the most money went?" · [COFFEE] [DINING] [SHOPPING] [RIDESHARE] *(gates everything below)*
+- **Guess result** *(after guess)*: computed per persona — see §4 Part 3b.
+- **Category reveal** *(after guess)*: the active persona's six categories, longest-first · closing line "You didn't make one big purchase. You made dozens of small ones." *(generic — no dollar amount)*
+- **Total** *(after guess; the closer):* "Those purchases didn't feel very big. Together, they were…" · "${discretionaryTotal}"
+- **Takeaway:** "Your money didn't disappear. It went somewhere. Understanding where gives you the power to decide where it goes next." · optional "This is more than the ${remainingFinal} left over." · [Try another paycheck] *(resets all state + returns to Part 0)*
