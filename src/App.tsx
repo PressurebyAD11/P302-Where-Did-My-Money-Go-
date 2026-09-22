@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthProvider';
 import { StoryProvider } from './context/StoryProvider';
 import { useStory } from './context/useStory';
+import { Header } from './components/Header';
+import { ScrollTrigger } from './lib/gsap';
 import SectionHook from './components/sections/SectionHook';
 import SectionPaycheck from './components/sections/SectionPaycheck';
 import SectionFixedExpenses from './components/sections/SectionFixedExpenses';
@@ -15,23 +18,30 @@ function StoryLayout() {
   const { guess } = useStory();
 
   return (
-    <main className="min-h-screen bg-stone-100 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <SectionHook />
-        <SectionPaycheck />
-        <SectionFixedExpenses />
-        <SectionSmallPurchases />
-        <SectionGuess />
-        <SectionGuessResult />
-        {guess && <SectionCategoryReveal />}
-        {guess && <SectionRevealPause />}
-        <SectionTakeaway />
-      </div>
-    </main>
+    <>
+      <Header />
+      <main className="min-h-screen bg-stone-100 px-4 pb-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl space-y-6">
+          <SectionHook />
+          <SectionPaycheck />
+          <SectionFixedExpenses />
+          <SectionSmallPurchases />
+          <SectionGuess />
+          <SectionGuessResult />
+          {guess && <SectionCategoryReveal />}
+          {guess && <SectionRevealPause />}
+          <SectionTakeaway />
+        </div>
+      </main>
+    </>
   );
 }
 
 function App() {
+  useEffect(() => {
+    ScrollTrigger.refresh();
+  }, []);
+
   return (
     <AuthProvider>
       <StoryProvider>
