@@ -127,30 +127,6 @@ This is designed for product and stakeholder conversations as a prototype for a 
 
 This creates a stronger product story than a static app screen: the user experiences the financial insight as a journey rather than a list of numbers.
 
-## Screenshot section
-
-> Add screenshots in the project docs or product review folder to visually capture the main flows:
->
-> - landing page hero and CTA area
-> - “See how it works” demo expansion
-> - mock sign-in experience
-> - profile summary with linked accounts
-> - personalized persona story and reveal sequence
-> - dark mode version for presentation review
-
-Example placeholder structure:
-
-```md
-### Landing page
-![Landing page hero](./docs/screenshots/landing-page.png)
-
-### Demo reveal
-![Interactive demo](./docs/screenshots/demo-reveal.png)
-
-### Persona account view
-![Account summary](./docs/screenshots/profile-summary.png)
-```
-
 ## Notes
 
 This project is intentionally a UX and product prototype rather than a real finance app. It uses mock data to demonstrate a polished onboarding and behavior-change experience for money awareness and budgeting education.
