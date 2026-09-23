@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getPersona, getStory, type CategoryId, type PersonaId, type Story } from '../data/story';
 import { StoryContext } from './useStory';
 
@@ -6,6 +6,7 @@ export function StoryProvider({ children }: { children: ReactNode }) {
   const [story, setStory] = useState<Story | null>(null);
   const [activePersonaId, setActivePersonaId] = useState<PersonaId>('alex');
   const [guess, setGuess] = useState<CategoryId | null>(null);
+  const hasUserSelectedPersonaRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -13,7 +14,10 @@ export function StoryProvider({ children }: { children: ReactNode }) {
     getStory().then((nextStory) => {
       if (isMounted) {
         setStory(nextStory);
-        setActivePersonaId(nextStory.defaultPersonaId);
+
+        if (!hasUserSelectedPersonaRef.current) {
+          setActivePersonaId(nextStory.defaultPersonaId);
+        }
       }
     });
 
@@ -32,6 +36,7 @@ export function StoryProvider({ children }: { children: ReactNode }) {
 
   const switchPersona = useCallback(
     (id: PersonaId) => {
+      hasUserSelectedPersonaRef.current = true;
       setActivePersonaId(id);
       resetStoryFlow();
     },
@@ -40,6 +45,7 @@ export function StoryProvider({ children }: { children: ReactNode }) {
 
   const switchPersonaNoScroll = useCallback(
     (id: PersonaId) => {
+      hasUserSelectedPersonaRef.current = true;
       setActivePersonaId(id);
       setGuess(null);
     },
