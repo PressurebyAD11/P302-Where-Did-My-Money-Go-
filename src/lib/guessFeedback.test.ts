@@ -1,6 +1,6 @@
 // src/lib/guessFeedback.test.ts
 import { describe, it, expect } from 'vitest';
-import { guessFeedback } from '../lib/guessFeedback';
+import { guessFeedback } from './guessFeedback';
 import { STORY } from '../data/story.data';
 import type { Persona, PersonaId } from '../data/story';
 
