@@ -4,7 +4,7 @@ import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
 import { formatMoney } from '../../lib/format';
 
 export default function SectionTakeaway() {
-  const { activePersona, replay } = useStory();
+  const { activePersona } = useStory();
   const root = useRef<HTMLElement>(null);
   const insightRef = useRef<HTMLDivElement>(null);
 
@@ -81,20 +81,8 @@ export default function SectionTakeaway() {
           </p>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={replay}
-            className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white"
-          >
-            Try another paycheck
-          </button>
-        </div>
-
         <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-4 text-base text-stone-700">
-          {activePersona.discretionaryTotal >= activePersona.remainingFinal
-            ? `This is more than the ${formatMoney(activePersona.remainingFinal)} left over.`
-            : null}
+          Keep a small-weekly budget for convenience spending: set a cap for takeout, rideshares, and impulse buys, then move that amount into a "fun money" bucket so the dozen little purchases stop quietly eating the paycheck.
         </div>
       </div>
     </section>
