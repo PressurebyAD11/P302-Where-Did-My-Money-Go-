@@ -33,8 +33,6 @@ type MockUser = {
   availableCash: string;
 };
 
-type AuthMode = 'login' | 'create';
-
 const MOCK_USERS: MockUser[] = [
   {
     id: 'alex-rivera',
@@ -215,18 +213,14 @@ function ProfileSummary({ user }: { user: MockUser }) {
 }
 
 function AuthModal({
-  mode,
   form,
   error,
-  onModeChange,
   onClose,
   onFormChange,
   onSubmit,
 }: {
-  mode: AuthMode;
   form: typeof EMPTY_FORM;
   error: string;
-  onModeChange: (mode: AuthMode) => void;
   onClose: () => void;
   onFormChange: (field: keyof typeof EMPTY_FORM, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -237,9 +231,7 @@ function AuthModal({
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium tracking-[0.18em] text-stone-500 uppercase">Secure access</p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-900">
-              {mode === 'login' ? 'Welcome back' : 'Create your account'}
-            </h2>
+            <h2 className="mt-2 text-2xl font-semibold text-stone-900">Welcome back</h2>
           </div>
           <button
             type="button"
@@ -252,20 +244,6 @@ function AuthModal({
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
-          {mode === 'create' && (
-            <div className="space-y-1.5">
-              <label htmlFor="fullName" className="block text-sm font-medium text-stone-700">Full name</label>
-              <input
-                id="fullName"
-                type="text"
-                value={form.fullName}
-                onChange={(event) => onFormChange('fullName', event.target.value)}
-                className="h-11 w-full rounded-2xl border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:bg-white"
-                placeholder="Jordan Lee"
-              />
-            </div>
-          )}
-
           <div className="space-y-1.5">
             <label htmlFor="email" className="block text-sm font-medium text-stone-700">Email</label>
             <input
@@ -290,39 +268,14 @@ function AuthModal({
             />
           </div>
 
-          {mode === 'create' && (
-            <div className="space-y-1.5">
-              <label htmlFor="bankName" className="block text-sm font-medium text-stone-700">Linked bank</label>
-              <select
-                id="bankName"
-                value={form.bankName}
-                onChange={(event) => onFormChange('bankName', event.target.value)}
-                className="h-11 w-full rounded-2xl border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:bg-white"
-              >
-                <option value="Chase">Chase</option>
-                <option value="Bank of America">Bank of America</option>
-                <option value="Wells Fargo">Wells Fargo</option>
-                <option value="Capital One">Capital One</option>
-              </select>
-            </div>
-          )}
-
           {error && <p className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
-          <div className="flex items-center justify-between gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => onModeChange(mode === 'login' ? 'create' : 'login')}
-              className="text-sm font-medium text-stone-600 transition hover:text-stone-900"
-            >
-              {mode === 'login' ? 'Create account' : 'Log in'}
-            </button>
-
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="submit"
               className="rounded-full bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-stone-700"
             >
-              {mode === 'login' ? 'Continue' : 'Create account'}
+              Continue
             </button>
           </div>
         </form>
@@ -331,7 +284,9 @@ function AuthModal({
   );
 }
 
-function LandingExperience({ onOpenAuth }: { onOpenAuth: (mode?: AuthMode) => void }) {
+function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
+  const [showDemo, setShowDemo] = useState(false);
+
   const featureCards = [
     {
       title: 'Connect your accounts',
@@ -348,6 +303,41 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: (mode?: AuthMode) => vo
   ];
 
   const trustPoints = ['25k+ habits tracked', 'Bank-level mock security', 'Built for clarity, not guilt'];
+  const demoSteps = [
+    {
+      number: '01',
+      title: 'Track the flow',
+      subtitle: 'Money in',
+      text: 'See paycheck inflow, fixed bills, and small purchases side by side.',
+      mock: [
+        { label: 'Income', value: '$5,600', tone: 'bg-stone-900' },
+        { label: 'Bills', value: '$2,430', tone: 'bg-stone-200' },
+        { label: 'Left', value: '$1,910', tone: 'bg-stone-100' },
+      ],
+    },
+    {
+      number: '02',
+      title: 'Spot the leak',
+      subtitle: 'Hidden costs',
+      text: 'Highlight the spending categories that quietly add up without feeling obvious.',
+      mock: [
+        { label: 'Coffee', value: '$78', tone: 'bg-stone-200' },
+        { label: 'Rideshare', value: '$134', tone: 'bg-stone-300' },
+        { label: 'Takeout', value: '$412', tone: 'bg-stone-900' },
+      ],
+    },
+    {
+      number: '03',
+      title: 'Adjust the plan',
+      subtitle: 'Smarter habits',
+      text: 'Set better guardrails for takeout, rideshares, and impulse purchases.',
+      mock: [
+        { label: 'Budget', value: '82%', tone: 'bg-emerald-500' },
+        { label: 'Saved', value: '$390', tone: 'bg-stone-900' },
+        { label: 'Goal', value: '+$120', tone: 'bg-stone-100' },
+      ],
+    },
+  ];
 
   return (
     <section className="rounded-[2rem] border border-stone-200 bg-white/95 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
@@ -366,17 +356,14 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: (mode?: AuthMode) => vo
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => onOpenAuth('create')}
-              className="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-700"
+              onClick={() => setShowDemo((current) => !current)}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-stone-900 via-stone-800 to-stone-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_35px_rgba(28,25,23,0.28)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_40px_rgba(28,25,23,0.34)] focus:outline-none focus:ring-4 focus:ring-stone-300"
             >
-              Try it today
+              <span>See how it works</span>
+              <span aria-hidden="true" className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-base">
+                ↓
+              </span>
             </button>
-            <a
-              href="#story"
-              className="rounded-full border border-stone-200 bg-stone-50 px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-100"
-            >
-              See how it works
-            </a>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-medium tracking-[0.14em] text-stone-500 uppercase">
@@ -416,6 +403,64 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: (mode?: AuthMode) => vo
           </div>
         </div>
       </div>
+
+      {showDemo && (
+        <div className="demo-panel-enter mt-10 overflow-hidden rounded-[2rem] border border-stone-200 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.96),_rgba(245,245,244,1)_32%,_rgba(231,229,228,1)_100%)] p-5 shadow-[0_28px_80px_rgba(15,23,42,0.10)] sm:p-6">
+          <div className="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-stone-500">How it works</p>
+              <h2 className="mt-2 text-2xl font-black tracking-[-0.05em] text-stone-900 sm:text-3xl">See the story behind the numbers</h2>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-600 shadow-sm">
+              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              3-step demo
+            </span>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {demoSteps.map((step, index) => (
+              <div
+                key={step.number}
+                className="demo-card group rounded-[1.5rem] border border-stone-200 bg-white/80 p-4 backdrop-blur-sm"
+                style={{ animationDelay: `${index * 90}ms` }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-stone-500">{step.number}</p>
+                  <span className="rounded-full bg-stone-100 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-600">
+                    {step.subtitle}
+                  </span>
+                </div>
+
+                <h3 className="mt-4 text-lg font-semibold text-stone-900">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{step.text}</p>
+
+                <div className="mt-4 rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                  <div className="mb-2 flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.16em] text-stone-500">
+                    <span>Overview</span>
+                    <span>{step.subtitle}</span>
+                  </div>
+                  <div className="space-y-2">
+                    {step.mock.map((item) => (
+                      <div key={item.label} className="flex items-center gap-2 text-[11px] text-stone-600">
+                        <span className={`h-2.5 w-2.5 rounded-full ${item.tone}`} />
+                        <span className="w-16 text-stone-500">{item.label}</span>
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200">
+                          <div className={`h-full rounded-full ${item.tone}`} style={{ width: item.label === 'Budget' ? '82%' : item.label === 'Saved' ? '68%' : item.label === 'Goal' ? '76%' : item.label === 'Takeout' ? '72%' : item.label === 'Rideshare' ? '54%' : item.label === 'Coffee' ? '38%' : '100%' }} />
+                        </div>
+                        <span className="font-semibold text-stone-800">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-stone-200">
+                  <div className="demo-progress h-full rounded-full bg-gradient-to-r from-stone-900 via-stone-700 to-stone-500" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         {featureCards.map((card) => (
@@ -472,7 +517,7 @@ function StoryLayout({
   onLogout,
 }: {
   session: MockUser | null;
-  onOpenAuth: (mode?: AuthMode) => void;
+  onOpenAuth: () => void;
   onLogout: () => void;
 }) {
   const { activePersonaId } = useStory();
@@ -524,7 +569,6 @@ function PersonaSessionBridge({ session }: { session: MockUser | null }) {
 
 function App() {
   const [session, setSession] = useState<MockUser | null>(null);
-  const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState('');
@@ -533,8 +577,7 @@ function App() {
     ScrollTrigger.refresh();
   }, []);
 
-  const handleOpenAuth = (mode: AuthMode = 'login') => {
-    setAuthMode(mode);
+  const handleOpenAuth = () => {
     setError('');
     setForm(EMPTY_FORM);
     setIsAuthOpen(true);
@@ -555,63 +598,16 @@ function App() {
 
     const normalizedEmail = form.email.trim().toLowerCase();
 
-    if (authMode === 'login') {
-      const matchingUser = MOCK_USERS.find(
-        (user) => user.email.toLowerCase() === normalizedEmail && user.password === form.password,
-      );
+    const matchingUser = MOCK_USERS.find(
+      (user) => user.email.toLowerCase() === normalizedEmail && user.password === form.password,
+    );
 
-      if (!matchingUser) {
-        setError('We could not find that account. Try alex@example.com with Password123!.');
-        return;
-      }
-
-      setSession(matchingUser);
-      setIsAuthOpen(false);
-      setForm(EMPTY_FORM);
-      setError('');
+    if (!matchingUser) {
+      setError('We could not find that account. Try alex@example.com with Password123!.');
       return;
     }
 
-    if (!form.fullName.trim()) {
-      setError('Please add your full name to finish creating an account.');
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-
-    if (form.password.length < 8) {
-      setError('Use at least 8 characters for your password.');
-      return;
-    }
-
-    const createdUser: MockUser = {
-      id: `user-${Date.now()}`,
-      fullName: form.fullName.trim(),
-      email: normalizedEmail,
-      password: form.password,
-      profileLabel: 'Mock profile',
-      linkedAccounts: [
-        {
-          bank: form.bankName || 'Chase',
-          type: 'Checking',
-          last4: '9012',
-          balance: '$2,460.91',
-          status: 'Connected securely',
-        },
-        {
-          bank: 'Bank of America',
-          type: 'Savings',
-          last4: '2224',
-          balance: '$6,830.55',
-          status: 'Connected securely',
-        },
-      ],
-    };
-
-    setSession(createdUser);
+    setSession(matchingUser);
     setIsAuthOpen(false);
     setForm(EMPTY_FORM);
     setError('');
@@ -619,7 +615,6 @@ function App() {
 
   const handleLogout = () => {
     setSession(null);
-    setAuthMode('login');
     setIsAuthOpen(false);
   };
 
@@ -629,13 +624,8 @@ function App() {
       <StoryLayout session={session} onOpenAuth={handleOpenAuth} onLogout={handleLogout} />
       {isAuthOpen && (
         <AuthModal
-          mode={authMode}
           form={form}
           error={error}
-          onModeChange={(nextMode) => {
-            setAuthMode(nextMode);
-            setError('');
-          }}
           onClose={handleCloseAuth}
           onFormChange={handleFormChange}
           onSubmit={handleSubmit}

@@ -23,14 +23,14 @@ describe('mock auth flow', () => {
     expect(screen.getByText(/where do you think the most money went/i)).toBeInTheDocument();
   });
 
-  it('opens the account creation flow from the landing-page CTA', async () => {
+  it('expands the landing-page demo from the primary CTA', async () => {
     const user = userEvent.setup();
 
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /try it today/i }));
+    await user.click(screen.getByRole('button', { name: /see how it works/i }));
 
-    expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /see the story behind the numbers/i })).toBeInTheDocument();
   });
 
   it('lets a logged-in user switch personas from the top app bar', async () => {
@@ -53,6 +53,23 @@ describe('mock auth flow', () => {
     expect(jordanButton).toHaveAttribute('aria-pressed', 'true');
     expect(await screen.findByText(/curated for jordan/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /jordan lee/i })).toBeInTheDocument();
+  });
+
+  it('resets the page to the top when switching personas', async () => {
+    const user = userEvent.setup();
+    const scrollToSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /log in/i }));
+    await user.type(screen.getByLabelText(/email/i), 'alex@example.com');
+    await user.type(screen.getByLabelText(/password/i), 'Password123!');
+    await user.click(screen.getByRole('button', { name: /continue/i }));
+
+    await user.click(screen.getByRole('button', { name: /jordan/i }));
+
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+    scrollToSpy.mockRestore();
   });
 
   it('allows a mock account login and logout while keeping the homepage visible', async () => {

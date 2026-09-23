@@ -2,12 +2,12 @@ import { useStory } from '../context/useStory';
 
 type HeaderProps = {
   session: { fullName: string; email: string } | null;
-  onOpenAuth: (mode?: 'login' | 'create') => void;
+  onOpenAuth: () => void;
   onLogout: () => void;
 };
 
 export function Header({ session, onOpenAuth, onLogout }: HeaderProps) {
-  const { activePersonaId, switchPersonaNoScroll } = useStory();
+  const { activePersonaId, switchPersona } = useStory();
   const personaOptions = [
     { id: 'alex', label: 'Alex' },
     { id: 'jordan', label: 'Jordan' },
@@ -35,7 +35,7 @@ export function Header({ session, onOpenAuth, onLogout }: HeaderProps) {
                       key={persona.id}
                       type="button"
                       aria-pressed={selected}
-                      onClick={() => switchPersonaNoScroll(persona.id)}
+                      onClick={() => switchPersona(persona.id)}
                       className={[
                         'rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors',
                         selected
@@ -65,14 +65,7 @@ export function Header({ session, onOpenAuth, onLogout }: HeaderProps) {
               </div>
               <button
                 type="button"
-                onClick={() => onOpenAuth('create')}
-                className="rounded-full border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-              >
-                Create account
-              </button>
-              <button
-                type="button"
-                onClick={() => onOpenAuth('login')}
+                onClick={onOpenAuth}
                 className="rounded-full bg-stone-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
               >
                 Log in
