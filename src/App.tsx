@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { AuthProvider } from './context/AuthProvider';
 import { StoryProvider } from './context/StoryProvider';
 import { useStory } from './context/useStory';
 import { Header } from './components/Header';
@@ -20,7 +19,7 @@ function StoryLayout() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-stone-100 px-4 pb-8 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-stone-100 px-4 pb-8 pt-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl space-y-6">
           <SectionHook />
           <SectionPaycheck />
@@ -43,11 +42,9 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <StoryProvider>
-        <StoryLayout />
-      </StoryProvider>
-    </AuthProvider>
+    <StoryProvider>
+      <StoryLayout />
+    </StoryProvider>
   );
 }
 
