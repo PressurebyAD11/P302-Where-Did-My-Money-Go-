@@ -3,11 +3,14 @@ import { useStory } from '../../context/useStory';
 import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
 import { formatMoney } from '../../lib/format';
 
-export default function SectionSmallPurchases() {
+type ThemeMode = 'light' | 'dark';
+
+export default function SectionSmallPurchases({ theme = 'light' }: { theme?: ThemeMode }) {
   const { activePersona } = useStory();
   const root = useRef<HTMLElement>(null);
   const balanceRef = useRef<HTMLDivElement>(null);
   const payoffGroupRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (!activePersona) {
@@ -113,8 +116,8 @@ export default function SectionSmallPurchases() {
 
   return (
     <section ref={root} className="py-10">
-      <div className="space-y-6 rounded-[2rem] border border-stone-200 bg-stone-50 p-6 sm:p-8">
-        <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
+      <div className={['space-y-6 rounded-[2rem] border p-6 sm:p-8', isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-stone-50'].join(' ')}>
+        <p className={['text-sm font-medium uppercase tracking-[0.18em]', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>
           Then the small purchases start.
         </p>
 
@@ -122,32 +125,32 @@ export default function SectionSmallPurchases() {
           {activePersona.transactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="sp-row flex items-center justify-between rounded-xl border border-stone-200 bg-white px-3 py-2"
+              className={['sp-row flex items-center justify-between rounded-xl border px-3 py-2', isDark ? 'border-slate-700 bg-slate-800' : 'border-stone-200 bg-white'].join(' ')}
             >
               <div className="flex items-center gap-3">
                 <span className="text-lg" aria-hidden="true">{transaction.icon}</span>
                 <div>
-                  <div className="text-sm font-medium text-stone-700">{transaction.merchant}</div>
-                  <div className="text-[0.68rem] uppercase tracking-[0.18em] text-stone-400">
+                  <div className={['text-sm font-medium', isDark ? 'text-slate-100' : 'text-stone-700'].join(' ')}>{transaction.merchant}</div>
+                  <div className={['text-[0.68rem] uppercase tracking-[0.18em]', isDark ? 'text-slate-400' : 'text-stone-400'].join(' ')}>
                     {transaction.category}
                   </div>
                 </div>
               </div>
-              <span className="text-sm font-semibold text-stone-900 tabular-nums">
+              <span className={['text-sm font-semibold tabular-nums', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>
                 {formatMoney(transaction.amount)}
               </span>
             </div>
           ))}
         </div>
 
-        <div ref={payoffGroupRef} className="border-t border-stone-200 pt-4">
+        <div ref={payoffGroupRef} className={['border-t pt-4', isDark ? 'border-slate-700' : 'border-stone-200'].join(' ')}>
           <p
             ref={balanceRef}
-            className="text-3xl font-black tracking-[-0.07em] text-stone-900 tabular-nums"
+            className={['text-3xl font-black tracking-[-0.07em] tabular-nums', isDark ? 'text-white' : 'text-stone-900'].join(' ')}
           >
             {formatMoney(activePersona.remainingAfterFixed)}
           </p>
-          <p className="mt-2 text-base text-stone-600">left</p>
+          <p className={['mt-2 text-base', isDark ? 'text-slate-300' : 'text-stone-600'].join(' ')}>left</p>
         </div>
       </div>
     </section>

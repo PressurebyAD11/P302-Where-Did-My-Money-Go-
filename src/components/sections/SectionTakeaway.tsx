@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useStory } from '../../context/useStory';
 import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
-import { formatMoney } from '../../lib/format';
 
-export default function SectionTakeaway() {
+type ThemeMode = 'light' | 'dark';
+
+export default function SectionTakeaway({ theme = 'light' }: { theme?: ThemeMode }) {
   const { activePersona } = useStory();
   const root = useRef<HTMLElement>(null);
   const insightRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (!activePersona) {
@@ -74,14 +76,14 @@ export default function SectionTakeaway() {
 
   return (
     <section ref={root} className="py-10">
-      <div className="rounded-[2rem] border border-stone-200 bg-stone-50 p-6 sm:p-8">
+      <div className={['rounded-[2rem] border p-6 sm:p-8', isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-stone-50'].join(' ')}>
         <div ref={insightRef}>
-          <p className="text-base font-medium text-stone-700">
+          <p className={['text-base font-medium', isDark ? 'text-slate-200' : 'text-stone-700'].join(' ')}>
             Your money didn&apos;t disappear. It went somewhere. Understanding where gives you the power to decide where it goes next.
           </p>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-4 text-base text-stone-700">
+        <div className={['mt-8 rounded-2xl border p-4 text-base', isDark ? 'border-slate-700 bg-slate-800 text-slate-200' : 'border-stone-200 bg-white text-stone-700'].join(' ')}>
           Keep a small-weekly budget for convenience spending: set a cap for takeout, rideshares, and impulse buys, then move that amount into a "fun money" bucket so the dozen little purchases stop quietly eating the paycheck.
         </div>
       </div>

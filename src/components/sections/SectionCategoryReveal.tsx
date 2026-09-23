@@ -3,11 +3,14 @@ import { useStory } from '../../context/useStory';
 import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
 import { formatMoney } from '../../lib/format';
 
-export default function SectionCategoryReveal() {
+type ThemeMode = 'light' | 'dark';
+
+export default function SectionCategoryReveal({ theme = 'light' }: { theme?: ThemeMode }) {
   const { activePersona } = useStory();
   const root = useRef<HTMLElement>(null);
   const barRowsRef = useRef<HTMLDivElement>(null);
   const payoffRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (!activePersona) {
@@ -92,8 +95,8 @@ export default function SectionCategoryReveal() {
 
   return (
     <section ref={root} className="py-10">
-      <div className="rounded-[2rem] border border-stone-200 bg-white p-6 sm:p-8">
-        <h3 className="text-2xl font-black tracking-[-0.06em] text-stone-900">
+      <div className={['rounded-[2rem] border p-6 sm:p-8', isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-white'].join(' ')}>
+        <h3 className={['text-2xl font-black tracking-[-0.06em]', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>
           Where it actually went
         </h3>
 
@@ -102,13 +105,13 @@ export default function SectionCategoryReveal() {
             .sort((a, b) => b.amount - a.amount)
             .map((category) => (
               <div key={category.category} className="space-y-2">
-                <div className="flex items-center justify-between gap-4 text-sm font-medium text-stone-700">
+                <div className={['flex items-center justify-between gap-4 text-sm font-medium', isDark ? 'text-slate-200' : 'text-stone-700'].join(' ')}>
                   <span>{category.label}</span>
                   <span data-amount={category.category} className="category-amount tabular-nums">
                     {formatMoney(category.amount)}
                   </span>
                 </div>
-                <div className="h-3 w-full overflow-hidden rounded-full bg-stone-200">
+                <div className={['h-3 w-full overflow-hidden rounded-full', isDark ? 'bg-slate-700' : 'bg-stone-200'].join(' ')}>
                   <div
                     data-fill
                     className="h-full rounded-full"
@@ -122,8 +125,8 @@ export default function SectionCategoryReveal() {
             ))}
         </div>
 
-        <div ref={payoffRef} className="mt-8 border-t border-stone-200 pt-5">
-          <p className="text-lg font-semibold text-stone-700">
+        <div ref={payoffRef} className={['mt-8 border-t pt-5', isDark ? 'border-slate-700' : 'border-stone-200'].join(' ')}>
+          <p className={['text-lg font-semibold', isDark ? 'text-slate-200' : 'text-stone-700'].join(' ')}>
             You didn&apos;t make one big purchase. You made dozens of small ones.
           </p>
         </div>

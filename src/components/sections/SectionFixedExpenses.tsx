@@ -3,11 +3,14 @@ import { useStory } from '../../context/useStory';
 import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
 import { formatMoney } from '../../lib/format';
 
-export default function SectionFixedExpenses() {
+type ThemeMode = 'light' | 'dark';
+
+export default function SectionFixedExpenses({ theme = 'light' }: { theme?: ThemeMode }) {
   const { activePersona } = useStory();
   const root = useRef<HTMLElement>(null);
   const balanceRef = useRef<HTMLDivElement>(null);
   const payoffGroupRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (!activePersona) {
@@ -113,20 +116,20 @@ export default function SectionFixedExpenses() {
 
   return (
     <section ref={root} data-section="fixed-expenses" className="py-10">
-      <div className="space-y-6 rounded-[2rem] border border-stone-200 bg-white p-6 sm:p-8">
+      <div className={['space-y-6 rounded-[2rem] border p-6 sm:p-8', isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-white'].join(' ')}>
         <div className="space-y-2">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-500">
+          <p className={['text-sm font-medium uppercase tracking-[0.2em]', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>
             The expected expenses
           </p>
 
           <div className="pt-4">
-            <span className="text-xs uppercase tracking-[0.2em] text-stone-500">
+            <span className={['text-xs uppercase tracking-[0.2em]', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>
               Remaining
             </span>
             <div
               ref={balanceRef}
               aria-live="polite"
-              className="text-5xl font-bold tracking-[-0.06em] text-stone-900 tabular-nums sm:text-6xl"
+              className={['text-5xl font-bold tracking-[-0.06em] tabular-nums sm:text-6xl', isDark ? 'text-white' : 'text-stone-900'].join(' ')}
             >
               {formatMoney(activePersona.paycheck)}
             </div>
@@ -137,24 +140,24 @@ export default function SectionFixedExpenses() {
           {activePersona.fixedExpenses.map((bill) => (
             <div
               key={bill.id}
-              className="fx-row flex items-center justify-between rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+              className={['fx-row flex items-center justify-between rounded-2xl border px-4 py-3', isDark ? 'border-slate-700 bg-slate-800' : 'border-stone-200 bg-stone-50'].join(' ')}
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl" aria-hidden="true">{bill.icon}</span>
-                <span className="text-base font-medium text-stone-700">{bill.label}</span>
+                <span className={['text-base font-medium', isDark ? 'text-slate-200' : 'text-stone-700'].join(' ')}>{bill.label}</span>
               </div>
-              <span className="text-base font-semibold text-stone-900 tabular-nums">
+              <span className={['text-base font-semibold tabular-nums', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>
                 {formatMoney(bill.amount)}
               </span>
             </div>
           ))}
         </div>
 
-        <div ref={payoffGroupRef} className="border-t border-stone-200 pt-4">
-          <p className="text-2xl font-bold tracking-[-0.04em] text-stone-900">
+        <div ref={payoffGroupRef} className={['border-t pt-4', isDark ? 'border-slate-700' : 'border-stone-200'].join(' ')}>
+          <p className={['text-2xl font-bold tracking-[-0.04em]', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>
             {formatMoney(activePersona.remainingAfterFixed)} left.
           </p>
-          <p className="mt-2 text-base text-stone-600">
+          <p className={['mt-2 text-base', isDark ? 'text-slate-300' : 'text-stone-600'].join(' ')}>
             So far, everything looks about right. Continue scrolling.
           </p>
         </div>

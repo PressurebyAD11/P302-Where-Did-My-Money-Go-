@@ -3,10 +3,13 @@ import { useStory } from '../../context/useStory';
 import { gsap, ScrollTrigger, useGSAP } from '../../lib/gsap';
 import { formatMoney } from '../../lib/format';
 
-export default function SectionRevealPause() {
+type ThemeMode = 'light' | 'dark';
+
+export default function SectionRevealPause({ theme = 'light' }: { theme?: ThemeMode }) {
   const { activePersona } = useStory();
   const root = useRef<HTMLElement>(null);
   const valueRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (!activePersona) {
@@ -85,8 +88,8 @@ export default function SectionRevealPause() {
 
   return (
     <section ref={root} className="py-10">
-      <div className="rounded-[2rem] border border-stone-200 bg-stone-950 p-6 text-stone-50 sm:p-8">
-        <p className="text-sm font-medium uppercase tracking-[0.22em] text-stone-400">
+      <div className={['rounded-[2rem] border p-6 sm:p-8', isDark ? 'border-slate-700 bg-slate-900 text-slate-50' : 'border-stone-200 bg-stone-950 text-stone-50'].join(' ')}>
+        <p className={['text-sm font-medium uppercase tracking-[0.22em]', isDark ? 'text-slate-300' : 'text-stone-400'].join(' ')}>
           Those purchases didn&apos;t feel very big. Together, they were…
         </p>
         <div

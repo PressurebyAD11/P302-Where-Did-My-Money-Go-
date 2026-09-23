@@ -33,6 +33,8 @@ type MockUser = {
   availableCash: string;
 };
 
+type ThemeMode = 'light' | 'dark';
+
 const MOCK_USERS: MockUser[] = [
   {
     id: 'alex-rivera',
@@ -149,61 +151,66 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-function ProfileSummary({ user }: { user: MockUser }) {
+function ProfileSummary({ user, theme }: { user: MockUser; theme: ThemeMode }) {
+  const isDark = theme === 'dark';
+
   return (
-    <section className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <section
+      className={[
+        'rounded-[2rem] border p-5 shadow-[rgba(32,41,76,0.10)_0px_12px_30px_0px] sm:p-6',
+        isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-white',
+      ].join(' ')}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-sm font-semibold text-white">
+          <div className={['flex h-12 w-12 items-center justify-center rounded-full text-sm font-semibold', isDark ? 'bg-white text-slate-900' : 'bg-stone-900 text-white'].join(' ')}>
             {getInitials(user.fullName)}
           </div>
           <div>
-            <p className="text-xs font-medium tracking-[0.18em] text-stone-500 uppercase">
+            <p className={['text-xs font-medium tracking-[0.18em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>
               {user.profileLabel}
             </p>
-            <h2 className="text-xl font-semibold text-stone-900">{user.fullName}</h2>
+            <h2 className={['text-xl font-semibold', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>{user.fullName}</h2>
           </div>
         </div>
 
-        <div className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
+        <div className={['rounded-full border px-3 py-1 text-sm font-medium', isDark ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-emerald-200 bg-emerald-50 text-emerald-700'].join(' ')}>
           Secure sync enabled
         </div>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-          <p className="text-xs font-medium tracking-[0.16em] text-stone-500 uppercase">Available cash</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">{user.availableCash}</p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-          <p className="text-xs font-medium tracking-[0.16em] text-stone-500 uppercase">Monthly income</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">{user.monthlyIncome}</p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-          <p className="text-xs font-medium tracking-[0.16em] text-stone-500 uppercase">Monthly spending</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">{user.monthlySpending}</p>
-        </div>
+        {[
+          { label: 'Available cash', value: user.availableCash },
+          { label: 'Monthly income', value: user.monthlyIncome },
+          { label: 'Monthly spending', value: user.monthlySpending },
+        ].map((item) => (
+          <div key={item.label} className={['rounded-2xl border p-4', isDark ? 'border-slate-700 bg-slate-800/80' : 'border-stone-200 bg-stone-50'].join(' ')}>
+            <p className={['text-xs font-medium tracking-[0.16em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>{item.label}</p>
+            <p className={['mt-2 text-2xl font-semibold tracking-tight', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>{item.value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="mt-6">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold tracking-[0.16em] text-stone-500 uppercase">Account overview</h3>
-          <span className="text-xs text-stone-500">{user.linkedAccounts.length} linked accounts</span>
+          <h3 className={['text-sm font-semibold tracking-[0.16em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>Account overview</h3>
+          <span className={['text-xs', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>{user.linkedAccounts.length} linked accounts</span>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           {user.linkedAccounts.map((account) => (
-            <div key={`${account.bank}-${account.last4}`} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+            <div key={`${account.bank}-${account.last4}`} className={['rounded-2xl border p-4', isDark ? 'border-slate-700 bg-slate-800/80' : 'border-stone-200 bg-stone-50'].join(' ')}>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-stone-900">{account.bank}</p>
-                  <p className="text-xs text-stone-500">{account.type} •••• {account.last4}</p>
+                  <p className={['text-sm font-semibold', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>{account.bank}</p>
+                  <p className={['text-xs', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>{account.type} •••• {account.last4}</p>
                 </div>
-                <span className="rounded-full bg-white px-2 py-1 text-[10px] font-medium tracking-wide text-emerald-700 uppercase">
+                <span className={['rounded-full px-2 py-1 text-[10px] font-medium tracking-wide uppercase', isDark ? 'bg-emerald-500/10 text-emerald-300' : 'bg-white text-emerald-700'].join(' ')}>
                   {account.status}
                 </span>
               </div>
-              <p className="mt-3 text-2xl font-semibold tracking-tight text-stone-900">{account.balance}</p>
+              <p className={['mt-3 text-2xl font-semibold tracking-tight', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>{account.balance}</p>
             </div>
           ))}
         </div>
@@ -218,25 +225,33 @@ function AuthModal({
   onClose,
   onFormChange,
   onSubmit,
+  theme,
 }: {
   form: typeof EMPTY_FORM;
   error: string;
   onClose: () => void;
   onFormChange: (field: keyof typeof EMPTY_FORM, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  theme: ThemeMode;
 }) {
+  const isDark = theme === 'dark';
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/45 p-4 backdrop-blur-sm">
-      <div role="dialog" aria-modal="true" className="w-full max-w-md rounded-3xl border border-stone-200 bg-white p-6 shadow-2xl">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className={['w-full max-w-md rounded-3xl border p-6 shadow-2xl', isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-white'].join(' ')}
+      >
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium tracking-[0.18em] text-stone-500 uppercase">Secure access</p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-900">Welcome back</h2>
+            <p className={['text-xs font-medium tracking-[0.18em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>Secure access</p>
+            <h2 className={['mt-2 text-2xl font-semibold', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>Welcome back</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-stone-200 px-2.5 py-1 text-sm text-stone-600 transition hover:bg-stone-100"
+            className={['rounded-full border px-2.5 py-1 text-sm transition', isDark ? 'border-slate-600 bg-slate-700 text-slate-100 hover:bg-slate-600' : 'border-stone-200 text-stone-600 hover:bg-stone-100'].join(' ')}
             aria-label="Close account dialog"
           >
             ✕
@@ -245,35 +260,48 @@ function AuthModal({
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="email" className="block text-sm font-medium text-stone-700">Email</label>
+            <label htmlFor="email" className={['block text-sm font-medium', isDark ? 'text-slate-200' : 'text-stone-700'].join(' ')}>Email</label>
             <input
               id="email"
               type="email"
               value={form.email}
               onChange={(event) => onFormChange('email', event.target.value)}
-              className="h-11 w-full rounded-2xl border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:bg-white"
+              className={[
+                'h-11 w-full rounded-2xl border px-3 text-sm outline-none transition',
+                isDark
+                  ? 'border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-sky-400 focus:bg-slate-800'
+                  : 'border-stone-200 bg-stone-50 text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:bg-white',
+              ].join(' ')}
               placeholder="you@example.com"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="block text-sm font-medium text-stone-700">Password</label>
+            <label htmlFor="password" className={['block text-sm font-medium', isDark ? 'text-slate-200' : 'text-stone-700'].join(' ')}>Password</label>
             <input
               id="password"
               type="password"
               value={form.password}
               onChange={(event) => onFormChange('password', event.target.value)}
-              className="h-11 w-full rounded-2xl border border-stone-200 bg-stone-50 px-3 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:bg-white"
+              className={[
+                'h-11 w-full rounded-2xl border px-3 text-sm outline-none transition',
+                isDark
+                  ? 'border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-sky-400 focus:bg-slate-800'
+                  : 'border-stone-200 bg-stone-50 text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:bg-white',
+              ].join(' ')}
               placeholder="At least 8 characters"
             />
           </div>
 
-          {error && <p className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {error && <p className={['rounded-2xl border px-3 py-2 text-sm', isDark ? 'border-red-500/30 bg-red-500/10 text-red-200' : 'border-red-200 bg-red-50 text-red-700'].join(' ')}>{error}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="submit"
-              className="rounded-full bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-stone-700"
+              className={[
+                'rounded-full px-4 py-2.5 text-sm font-semibold transition',
+                isDark ? 'bg-sky-500 text-white hover:bg-sky-400' : 'bg-stone-900 text-white hover:bg-stone-700',
+              ].join(' ')}
             >
               Continue
             </button>
@@ -284,8 +312,13 @@ function AuthModal({
   );
 }
 
-function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
+function LandingExperience({
+  theme,
+}: {
+  theme: ThemeMode;
+}) {
   const [showDemo, setShowDemo] = useState(false);
+  const isDark = theme === 'dark';
 
   const featureCards = [
     {
@@ -340,16 +373,21 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
   ];
 
   return (
-    <section className="rounded-[2rem] border border-stone-200 bg-white/95 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
+    <section
+      className={[
+        'rounded-[2rem] border p-6 shadow-[rgba(32,41,76,0.12)_0px_9px_25px_0px] sm:p-8 lg:p-10',
+        isDark ? 'border-[#334155] bg-[#0f172a]' : 'border-[#c7cbdb] bg-[#ffffff]',
+      ].join(' ')}
+    >
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-xl">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-stone-500">
+          <p className={['text-[0.68rem] font-semibold uppercase tracking-[0.28em]', isDark ? 'text-[#9bb7ff]' : 'text-[#375390]'].join(' ')}>
             Smarter money habits
           </p>
-          <h1 className="mt-4 text-4xl font-black tracking-[-0.07em] text-stone-900 sm:text-5xl lg:text-6xl">
+          <h1 className={['mt-4 text-5xl font-black tracking-[-0.09em] sm:text-6xl lg:text-[100px] lg:leading-[0.91]', isDark ? 'text-white' : 'text-[#20294c]'].join(' ')}>
             See where your money goes before it disappears.
           </h1>
-          <p className="mt-5 max-w-lg text-base leading-7 text-stone-600 sm:text-lg">
+          <p className={['mt-5 max-w-lg text-base leading-7 sm:text-lg', isDark ? 'text-slate-300' : 'text-[#676b89]'].join(' ')}>
             Where Did My Money Go? helps people connect the dots between income, recurring bills, and small decisions that quietly add up.
           </p>
 
@@ -357,47 +395,50 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
             <button
               type="button"
               onClick={() => setShowDemo((current) => !current)}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-stone-900 via-stone-800 to-stone-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_35px_rgba(28,25,23,0.28)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_40px_rgba(28,25,23,0.34)] focus:outline-none focus:ring-4 focus:ring-stone-300"
+              className={[
+                'inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-[rgba(32,41,76,0.10)_0px_1px_4px_0px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[rgba(32,41,76,0.12)_0px_9px_25px_0px] focus:outline-none focus:ring-4 focus:ring-[#459af8]/30',
+                isDark ? 'bg-white text-[#0f172a]' : 'bg-[#20294c] text-white',
+              ].join(' ')}
             >
               <span>See how it works</span>
-              <span aria-hidden="true" className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-base">
+              <span aria-hidden="true" className={['inline-flex h-6 w-6 items-center justify-center rounded-full text-base', isDark ? 'bg-slate-900 text-white' : 'bg-white/10 text-white'].join(' ')}>
                 ↓
               </span>
             </button>
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-medium tracking-[0.14em] text-stone-500 uppercase">
+          <div className={['mt-6 flex flex-wrap items-center gap-3 text-xs font-medium tracking-[0.14em] uppercase', isDark ? 'text-slate-300' : 'text-stone-500'].join(' ')}>
             {trustPoints.map((point) => (
-              <span key={point} className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-2">
+              <span key={point} className={['rounded-full border px-2.5 py-2', isDark ? 'border-slate-700 bg-slate-800/70 text-slate-200' : 'border-stone-200 bg-stone-50 text-stone-500'].join(' ')}>
                 {point}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="w-full max-w-md rounded-3xl border border-stone-200 bg-stone-50 p-4 sm:p-5">
-          <div className="flex items-center justify-between text-sm text-stone-600">
+        <div className={['w-full max-w-md rounded-3xl border p-4 sm:p-5', isDark ? 'border-slate-700 bg-slate-800' : 'border-stone-200 bg-stone-50'].join(' ')}>
+          <div className={['flex items-center justify-between text-sm', isDark ? 'text-slate-300' : 'text-stone-600'].join(' ')}>
             <span>Weekly snapshot</span>
-            <span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-emerald-700 uppercase">
+            <span className={['rounded-full px-2 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase', isDark ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-100 text-emerald-700'].join(' ')}>
               On track
             </span>
           </div>
           <div className="mt-6 space-y-4">
             <div>
-              <p className="text-[0.62rem] font-medium tracking-[0.2em] text-stone-500 uppercase">Income</p>
-              <p className="mt-1 text-3xl font-black tracking-[-0.06em] text-stone-900">$5,600</p>
+              <p className={['text-[0.62rem] font-medium tracking-[0.2em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>Income</p>
+              <p className={['mt-1 text-3xl font-black tracking-[-0.06em]', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>$5,600</p>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-stone-200">
-              <div className="h-full w-[72%] rounded-full bg-stone-900" />
+            <div className={['h-2 overflow-hidden rounded-full', isDark ? 'bg-slate-700' : 'bg-stone-200'].join(' ')}>
+              <div className={['h-full w-[72%] rounded-full', isDark ? 'bg-white' : 'bg-stone-900'].join(' ')} />
             </div>
-            <div className="grid grid-cols-2 gap-3 text-sm text-stone-600">
-              <div className="rounded-2xl bg-white p-3">
-                <p className="text-[0.6rem] font-medium tracking-[0.18em] text-stone-500 uppercase">Bills</p>
-                <p className="mt-2 text-xl font-bold text-stone-900">$2,430</p>
+            <div className={['grid grid-cols-2 gap-3 text-sm', isDark ? 'text-slate-300' : 'text-stone-600'].join(' ')}>
+              <div className={['rounded-2xl p-3', isDark ? 'bg-slate-900' : 'bg-white'].join(' ')}>
+                <p className={['text-[0.6rem] font-medium tracking-[0.18em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>Bills</p>
+                <p className={['mt-2 text-xl font-bold', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>$2,430</p>
               </div>
-              <div className="rounded-2xl bg-white p-3">
-                <p className="text-[0.6rem] font-medium tracking-[0.18em] text-stone-500 uppercase">Left</p>
-                <p className="mt-2 text-xl font-bold text-stone-900">$1,910</p>
+              <div className={['rounded-2xl p-3', isDark ? 'bg-slate-900' : 'bg-white'].join(' ')}>
+                <p className={['text-[0.6rem] font-medium tracking-[0.18em] uppercase', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>Left</p>
+                <p className={['mt-2 text-xl font-bold', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>$1,910</p>
               </div>
             </div>
           </div>
@@ -405,14 +446,14 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
       </div>
 
       {showDemo && (
-        <div className="demo-panel-enter mt-10 overflow-hidden rounded-[2rem] border border-stone-200 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.96),_rgba(245,245,244,1)_32%,_rgba(231,229,228,1)_100%)] p-5 shadow-[0_28px_80px_rgba(15,23,42,0.10)] sm:p-6">
-          <div className="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className={['demo-panel-enter mt-10 overflow-hidden rounded-[2rem] border p-5 shadow-[rgba(32,41,76,0.12)_0px_9px_25px_0px] sm:p-6', isDark ? 'border-slate-700 bg-slate-900' : 'border-[#c7cbdb] bg-[#f0f1f5]'].join(' ')}>
+          <div className={['flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-end sm:justify-between', isDark ? 'border-slate-700' : 'border-[#c7cbdb]'].join(' ')}>
             <div>
-              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-stone-500">How it works</p>
-              <h2 className="mt-2 text-2xl font-black tracking-[-0.05em] text-stone-900 sm:text-3xl">See the story behind the numbers</h2>
+              <p className={['text-[0.62rem] font-semibold uppercase tracking-[0.2em]', isDark ? 'text-[#9bb7ff]' : 'text-[#375390]'].join(' ')}>How it works</p>
+              <h2 className={['mt-2 text-2xl font-black tracking-[-0.05em] sm:text-3xl', isDark ? 'text-white' : 'text-[#20294c]'].join(' ')}>See the story behind the numbers</h2>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-600 shadow-sm">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            <span className={['inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] shadow-[rgba(32,41,76,0.10)_0px_1px_4px_0px]', isDark ? 'border-slate-700 bg-slate-800 text-slate-100' : 'border-[#c7cbdb] bg-white text-[#20294c]'].join(' ')}>
+              <span className="inline-flex h-2 w-2 rounded-full bg-[#459af8]" />
               3-step demo
             </span>
           </div>
@@ -421,40 +462,40 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
             {demoSteps.map((step, index) => (
               <div
                 key={step.number}
-                className="demo-card group rounded-[1.5rem] border border-stone-200 bg-white/80 p-4 backdrop-blur-sm"
+                className={['demo-card group rounded-[12px] border p-4 shadow-[rgba(32,41,76,0.07)_0px_4px_11px_0px,rgba(32,41,76,0.12)_0px_1px_3px_0px]', isDark ? 'border-slate-700 bg-slate-800' : 'border-[#c7cbdb] bg-white'].join(' ')}
                 style={{ animationDelay: `${index * 90}ms` }}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-stone-500">{step.number}</p>
-                  <span className="rounded-full bg-stone-100 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-600">
+                  <p className={['text-[0.62rem] font-semibold uppercase tracking-[0.2em]', isDark ? 'text-[#9bb7ff]' : 'text-[#375390]'].join(' ')}>{step.number}</p>
+                  <span className={['rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em]', isDark ? 'bg-slate-700 text-slate-200' : 'bg-[#f0f1f5] text-[#676b89]'].join(' ')}>
                     {step.subtitle}
                   </span>
                 </div>
 
-                <h3 className="mt-4 text-lg font-semibold text-stone-900">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-600">{step.text}</p>
+                <h3 className={['mt-4 text-lg font-semibold', isDark ? 'text-white' : 'text-[#20294c]'].join(' ')}>{step.title}</h3>
+                <p className={['mt-2 text-sm leading-6', isDark ? 'text-slate-300' : 'text-[#676b89]'].join(' ')}>{step.text}</p>
 
-                <div className="mt-4 rounded-2xl border border-stone-200 bg-stone-50 p-3">
-                  <div className="mb-2 flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.16em] text-stone-500">
+                <div className={['mt-4 rounded-[12px] border p-3', isDark ? 'border-slate-700 bg-slate-900' : 'border-[#c7cbdb] bg-[#f0f1f5]'].join(' ')}>
+                  <div className={['mb-2 flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.16em]', isDark ? 'text-[#9bb7ff]' : 'text-[#375390]'].join(' ')}>
                     <span>Overview</span>
                     <span>{step.subtitle}</span>
                   </div>
                   <div className="space-y-2">
                     {step.mock.map((item) => (
-                      <div key={item.label} className="flex items-center gap-2 text-[11px] text-stone-600">
+                      <div key={item.label} className={['flex items-center gap-2 text-[11px]', isDark ? 'text-slate-300' : 'text-[#676b89]'].join(' ')}>
                         <span className={`h-2.5 w-2.5 rounded-full ${item.tone}`} />
-                        <span className="w-16 text-stone-500">{item.label}</span>
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200">
+                        <span className={['w-16', isDark ? 'text-slate-300' : 'text-[#676b89]'].join(' ')}>{item.label}</span>
+                        <div className={['h-1.5 flex-1 overflow-hidden rounded-full', isDark ? 'bg-slate-700' : 'bg-[#c7cbdb]'].join(' ')}>
                           <div className={`h-full rounded-full ${item.tone}`} style={{ width: item.label === 'Budget' ? '82%' : item.label === 'Saved' ? '68%' : item.label === 'Goal' ? '76%' : item.label === 'Takeout' ? '72%' : item.label === 'Rideshare' ? '54%' : item.label === 'Coffee' ? '38%' : '100%' }} />
                         </div>
-                        <span className="font-semibold text-stone-800">{item.value}</span>
+                        <span className={['font-semibold', isDark ? 'text-white' : 'text-[#20294c]'].join(' ')}>{item.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-stone-200">
-                  <div className="demo-progress h-full rounded-full bg-gradient-to-r from-stone-900 via-stone-700 to-stone-500" />
+                <div className={['mt-4 h-1.5 w-full overflow-hidden rounded-full', isDark ? 'bg-slate-700' : 'bg-[#c7cbdb]'].join(' ')}>
+                  <div className={['demo-progress h-full rounded-full', isDark ? 'bg-white' : 'bg-[#20294c]'].join(' ')} />
                 </div>
               </div>
             ))}
@@ -464,12 +505,23 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         {featureCards.map((card) => (
-          <div key={card.title} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-            <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-base shadow-sm">
+          <div
+            key={card.title}
+            className={[
+              'rounded-[1.7rem] border p-5 shadow-[rgba(32,41,76,0.08)_0px_8px_24px_0px]',
+              isDark ? 'border-slate-700 bg-slate-800/80' : 'border-stone-200 bg-stone-50',
+            ].join(' ')}
+          >
+            <div
+              className={[
+                'mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full text-base font-bold shadow-sm',
+                isDark ? 'bg-slate-700 text-slate-100' : 'bg-white text-stone-700',
+              ].join(' ')}
+            >
               ✓
             </div>
-            <h2 className="text-lg font-semibold text-stone-900">{card.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-stone-600">{card.text}</p>
+            <h2 className={['text-[2rem] font-black tracking-[-0.05em]', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>{card.title}</h2>
+            <p className={['mt-3 text-base leading-7', isDark ? 'text-slate-300' : 'text-stone-600'].join(' ')}>{card.text}</p>
           </div>
         ))}
       </div>
@@ -477,35 +529,41 @@ function LandingExperience({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-function PersonaStoryView({ user }: { user: MockUser }) {
+function PersonaStoryView({ user, theme }: { user: MockUser; theme: ThemeMode }) {
   const { activePersona, guess } = useStory();
+  const isDark = theme === 'dark';
 
   return (
-    <section className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
-      <div className="mb-6 flex flex-col gap-3 border-b border-stone-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+    <section
+      className={[
+        'rounded-[2rem] border p-5 shadow-[rgba(32,41,76,0.10)_0px_12px_30px_0px] sm:p-6',
+        isDark ? 'border-slate-700 bg-slate-900' : 'border-stone-200 bg-white',
+      ].join(' ')}
+    >
+      <div className={['mb-6 flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-end sm:justify-between', isDark ? 'border-slate-700' : 'border-stone-200'].join(' ')}>
         <div>
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-stone-500">
+          <p className={['text-[0.68rem] font-semibold uppercase tracking-[0.22em]', isDark ? 'text-slate-400' : 'text-stone-500'].join(' ')}>
             Personalized demo
           </p>
-          <h3 className="mt-2 text-2xl font-black tracking-[-0.06em] text-stone-900">
+          <h3 className={['mt-2 text-2xl font-black tracking-[-0.06em]', isDark ? 'text-white' : 'text-stone-900'].join(' ')}>
             Your spending story for {activePersona?.name ?? user.fullName.split(' ')[0]}
           </h3>
         </div>
-        <div className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-medium text-stone-600">
+        <div className={['rounded-full border px-3 py-1 text-xs font-medium', isDark ? 'border-slate-700 bg-slate-800 text-slate-200' : 'border-stone-200 bg-stone-50 text-stone-600'].join(' ')}>
           Curated for {activePersona?.name ?? user.fullName}
         </div>
       </div>
 
       <div id="story" className="mx-auto max-w-3xl space-y-6">
-        <SectionHook />
-        <SectionPaycheck />
-        <SectionFixedExpenses />
-        <SectionSmallPurchases />
-        <SectionGuess />
-        <SectionGuessResult />
-        {guess && <SectionCategoryReveal />}
-        {guess && <SectionRevealPause />}
-        <SectionTakeaway />
+        <SectionHook theme={theme} />
+        <SectionPaycheck theme={theme} />
+        <SectionFixedExpenses theme={theme} />
+        <SectionSmallPurchases theme={theme} />
+        <SectionGuess theme={theme} />
+        <SectionGuessResult theme={theme} />
+        {guess && <SectionCategoryReveal theme={theme} />}
+        {guess && <SectionRevealPause theme={theme} />}
+        <SectionTakeaway theme={theme} />
       </div>
     </section>
   );
@@ -515,24 +573,37 @@ function StoryLayout({
   session,
   onOpenAuth,
   onLogout,
+  theme,
+  onToggleTheme,
 }: {
   session: MockUser | null;
   onOpenAuth: () => void;
   onLogout: () => void;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
 }) {
   const { activePersonaId } = useStory();
   const displayedSession = session ? getMockUserForPersona(activePersonaId, session) : null;
 
   return (
     <>
-      <Header session={displayedSession} onOpenAuth={onOpenAuth} onLogout={onLogout} />
-      <main className="min-h-screen bg-stone-100 px-4 pb-8 pt-6 sm:px-6 lg:px-8">
+      <Header
+        session={displayedSession}
+        onOpenAuth={onOpenAuth}
+        onLogout={onLogout}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
+      <main
+        className="min-h-screen px-4 pb-8 pt-6 sm:px-6 lg:px-8"
+        style={{ backgroundColor: theme === 'dark' ? '#020817' : '#f0f1f5' }}
+      >
         <div className="mx-auto max-w-5xl space-y-8">
-          {!session && <LandingExperience onOpenAuth={onOpenAuth} />}
+          {!session && <LandingExperience theme={theme} />}
           {session && displayedSession && (
             <>
-              <ProfileSummary user={displayedSession} />
-              <PersonaStoryView user={displayedSession} />
+              <ProfileSummary user={displayedSession} theme={theme} />
+              <PersonaStoryView user={displayedSession} theme={theme} />
             </>
           )}
         </div>
@@ -569,6 +640,7 @@ function PersonaSessionBridge({ session }: { session: MockUser | null }) {
 
 function App() {
   const [session, setSession] = useState<MockUser | null>(null);
+  const [theme, setTheme] = useState<ThemeMode>('light');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState('');
@@ -621,16 +693,29 @@ function App() {
   return (
     <StoryProvider>
       <PersonaSessionBridge session={session} />
-      <StoryLayout session={session} onOpenAuth={handleOpenAuth} onLogout={handleLogout} />
-      {isAuthOpen && (
-        <AuthModal
-          form={form}
-          error={error}
-          onClose={handleCloseAuth}
-          onFormChange={handleFormChange}
-          onSubmit={handleSubmit}
+      <div
+        data-theme={theme}
+        className="min-h-screen transition-colors duration-200"
+        style={{ backgroundColor: theme === 'dark' ? '#020817' : '#f0f1f5', color: theme === 'dark' ? '#e2e8f0' : '#20294c' }}
+      >
+        <StoryLayout
+          session={session}
+          onOpenAuth={handleOpenAuth}
+          onLogout={handleLogout}
+          theme={theme}
+          onToggleTheme={() => setTheme((current) => (current === 'light' ? 'dark' : 'light'))}
         />
-      )}
+        {isAuthOpen && (
+          <AuthModal
+            form={form}
+            error={error}
+            onClose={handleCloseAuth}
+            onFormChange={handleFormChange}
+            onSubmit={handleSubmit}
+            theme={theme}
+          />
+        )}
+      </div>
     </StoryProvider>
   );
 }
